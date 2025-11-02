@@ -8,6 +8,7 @@ USING_DOMU=no
 USE_GRAPHICS_PACKAGE=no
 ENABLE_VIRTIO=no
 ENABLE_DOMU_VIRTIO=no
+ENABLE_ZEPHYR=no
 CLEAN_BUILD_TEST=no
 
 CheckGraphicsPackage () {
@@ -30,12 +31,13 @@ Usage() {
     echo "    -g: Use graphics package(Default is not used)"
     echo "    -u: Using DomU(Default is disable)"
     echo "    -v: Enable Virtio backend on DomD(Default is disabled)"
+    echo "    -z: Build Zephyr images"
     echo "    -h: Show this usage"
 }
 
 # Proc arguments
 OPTIND=1
-while getopts "acghuv" OPT
+while getopts "acghuvz" OPT
 do
     case $OPT in
         a) USING_DOMA=yes; ENABLE_VIRTIO=yes ;;
@@ -43,6 +45,7 @@ do
         g) USE_GRAPHICS_PACKAGE=yes;;
         u) USING_DOMU=yes;;
         v) ENABLE_VIRTIO=yes;;
+        z) ENABLE_ZEPHYR=yes;;
         h) Usage; exit;;
         *) echo -e "\e[31mERROR: Unsupported option\e[m"; Usage; exit;;
     esac
@@ -80,6 +83,7 @@ moulin prod-devel-rcar4_new.yaml \
     --ENABLE_DOMU_VIRTIO ${ENABLE_DOMU_VIRTIO} \
     --USE_GRAPHICS_PACKAGE ${USE_GRAPHICS_PACKAGE} \
     --ENABLE_VIRTIO ${ENABLE_VIRTIO} \
+    --ENABLE_ZEPHYR ${ENABLE_ZEPHYR} \
     --ADD_META_TEST yes \
 
 ninja

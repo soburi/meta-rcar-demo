@@ -24,6 +24,10 @@ variables:
   ANDROID_KERNEL_DEPLOY_DIR: "out/deploy/common-modules/xen-virtual-device/xen_virtual_device_aarch64"
   ANDROID_DEVICE: "xenvm_trout_arm64"
   ANDROID_LUNCH_TARGET: "aosp_xenvm_trout_arm64-trunk_staging-userdebug"
+  DOMZ0_DIR: "zephyr_sync"
+  DOMZ0_BUILD_DIR: "build-sync"
+  DOMZ1_DIR: "zephyr_blinky"
+  DOMZ1_BUILD_DIR: "build-blinky"
 
 common_data:
   # Sources used by all yocto-based domains
@@ -229,6 +233,38 @@ components:
         - "--dist_dir=%{ANDROID_KERNEL_DEPLOY_DIR}"
       target_images:
         - "%{ANDROID_KERNEL_DEPLOY_DIR}/Image"
+
+  domz0_sync:
+    default: true
+    build-dir: "%{DOMZ0_DIR}"
+    sources:
+      - type: west
+        url: "https://github.com/soburi/zephyr.git"
+        rev: "sparrowhawk-demo1"
+    builder:
+      type: zephyr
+      board: xenvm/xenvm/gicv3
+      target: zephyr/samples/synchronization
+      work_dir: "%{DOMZ0_BUILD_DIR}"
+      target_images:
+        - "%{DOMZ0_BUILD_DIR}/zephyr/zephyr.bin"
+
+  domz1_blinky:
+    default: true
+    build-dir: "%{DOMZ1_DIR}"
+    sources:
+      - type: west
+        url: "https://github.com/soburi/zephyr.git"
+        rev: "sparrowhawk-demo1"
+    builder:
+      type: zephyr
+      board: xenvm/xenvm/gicv3
+      target: zephyr/samples/basic/blinky
+      work_dir: "%{DOMZ1_BUILD_DIR}"
+      snippets:
+        - "sparrowhawk_rcar_v4h_xen_domd"
+      target_images:
+        - "%{DOMZ1_BUILD_DIR}/zephyr/zephyr.bin"
 
   doma:
     build-dir: "%{DOMA_DIR}"
@@ -557,6 +593,27 @@ parameters:
                 type: raw_image
                 gpt_type: 0FC63DAF-8483-4772-8E79-3D69D8477DE4 # Linux filesystem data
                 image_path: "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/virtio-armv8-xt/core-image-weston-virtio-armv8-xt.rootfs.ext4"
+
+  ENABLE_ZEPHYR:
+    desc: "Build zephyr images and put into fitImage"
+    "no":
+      default: true
+    "yes":
+      overrides:
+        components:
+          fitimage_append:
+            builder:
+              args:
+                - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp/deploy/images/generic-armv8-xt/fitImage"
+                - "../meta-xen-dom0/recipes-core/core-image-thin-initramfs/files/fit-image.its"
+                - "+%{DOMZ0_DIR}/%{DOMZ0_BUILD_DIR}/zephyr/zephyr.bin:/boot/%{DOMZ0_DIR}.bin"
+                - "+%{DOMZ1_DIR}/%{DOMZ1_BUILD_DIR}/zephyr/zephyr.bin:/boot/%{DOMZ1_DIR}.bin"
+                - "+../zephyr_sync.conf:/boot/zephyr_sync.conf"
+                - "+../zephyr_blinky.conf:/boot/zephyr_blinky.conf"
+              additional_deps:
+                - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp/deploy/images/generic-armv8-xt/fitImage"
+                - "%{DOMZ0_DIR}/%{DOMZ0_BUILD_DIR}/zephyr/zephyr.bin"
+                - "%{DOMZ1_DIR}/%{DOMZ1_BUILD_DIR}/zephyr/zephyr.bin"
 
   ENABLE_ANDROID:
     desc: "Build Android as a guest VM"
