@@ -275,6 +275,19 @@ components:
         - "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/xenpolicy-4.19-unstable"
         - "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_XEN_DTB_NAME}"
 
+  fitimage_append:
+    build_dir: "fitimage_append"
+    builder:
+      type: custom_script
+      script: "../../fitimage_append.sh"
+      args:
+        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp/deploy/images/generic-armv8-xt/fitImage"
+        - "../meta-xen-dom0/recipes-core/core-image-thin-initramfs/files/fit-image.its"
+      target_images:
+        - "fitimage_append/fitImage"
+      additional_deps:
+        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp/deploy/images/generic-armv8-xt/fitImage"
+
 images:
   full:
     type: gpt
@@ -400,7 +413,7 @@ parameters:
               boot:
                 items:
                   "boot/flash.bin": "%{YOCTOS_WORK_DIR}/build-domd/tmp/deploy/images/%{MACHINE}/flash.bin"
-                  "boot/fitImage": "%{YOCTOS_WORK_DIR}/build-dom0/tmp/deploy/images/generic-armv8-xt/fitImage"
+                  "boot/fitImage": "fitimage_append/fitImage"
 
   USE_GRAPHICS_PACKAGE:
     desc: "Enable GPU on DomD"
