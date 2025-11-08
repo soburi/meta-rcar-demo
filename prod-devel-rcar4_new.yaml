@@ -240,7 +240,7 @@ components:
     sources:
       - type: west
         url: "https://github.com/soburi/zephyr.git"
-        rev: "sparrowhawk-demo1"
+        rev: "sparrowhawk-demo2"
     builder:
       type: zephyr
       board: xenvm/xenvm/gicv3
@@ -255,7 +255,7 @@ components:
     sources:
       - type: west
         url: "https://github.com/soburi/zephyr.git"
-        rev: "sparrowhawk-demo1"
+        rev: "sparrowhawk-demo2"
     builder:
       type: zephyr
       board: xenvm/xenvm/gicv3
