@@ -240,7 +240,7 @@ components:
     sources:
       - type: west
         url: "https://github.com/soburi/zephyr.git"
-        rev: "sparrowhawk-demo2"
+        rev: "sparrowhawk-demo4"
     builder:
       type: zephyr
       board: xenvm/xenvm/gicv3
@@ -255,7 +255,7 @@ components:
     sources:
       - type: west
         url: "https://github.com/soburi/zephyr.git"
-        rev: "sparrowhawk-demo2"
+        rev: "sparrowhawk-demo4"
     builder:
       type: zephyr
       board: xenvm/xenvm/gicv3
@@ -375,9 +375,10 @@ parameters:
           domd:
             sources:
               - type: git
-                url: https://github.com/rcar-community/meta-sparrow-hawk
+                url: https://github.com/soburi/meta-sparrow-hawk
+                rev: zephyr-domd
                 #rev: scarthgap
-                rev: scarthgap-dev-gfx2
+                #rev: scarthgap-dev-gfx2
                 #rev: scarthgap-dev-pcie-test
             builder:
               layers:
