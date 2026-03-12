@@ -4,6 +4,7 @@ SCRIPT_DIR=$(cd `dirname $0` && pwd)
 WORK_DIR=${SCRIPT_DIR}/work_v4hsbc_xen
 mkdir -p ${WORK_DIR}
 USE_GRAPHICS_PACKAGE=yes
+ENABLE_ZEPHYR=no
 CLEAN_BUILD_TEST=no
 INHERIT_RM_WORK=no
 
@@ -13,16 +14,18 @@ Usage() {
     echo "option:"
     echo "    -c: Clean Build test(Default is disable)"
     echo "    -r: Enable rm_work on Yocto build"
+    echo "    -z: Build Zephyr images"
     echo "    -h: Show this usage"
 }
 
 # Proc arguments
 OPTIND=1
-while getopts "chr" OPT
+while getopts "chrz" OPT
 do
     case $OPT in
         c) CLEAN_BUILD_TEST=yes;;
         r) INHERIT_RM_WORK=yes;;
+        z) ENABLE_ZEPHYR=yes;;
         h) Usage; exit;;
         *) echo -e "\e[31mERROR: Unsupported option\e[m"; Usage; exit;;
     esac
@@ -41,7 +44,8 @@ rm -rf yocto/build-dom*/conf
 moulin prod-devel-rcar4_new.yaml \
     --MACHINE sparrow-hawk \
     --USE_GRAPHICS_PACKAGE ${USE_GRAPHICS_PACKAGE} \
-    --ADD_META_TEST yes
+    --ADD_META_TEST yes \
+    --ENABLE_ZEPHYR ${ENABLE_ZEPHYR}
 
 cd "${WORK_DIR}"
 
