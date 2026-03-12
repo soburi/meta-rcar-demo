@@ -11,6 +11,7 @@ ENABLE_DOMU_VIRTIO=no
 CLEAN_BUILD_TEST=no
 ENABLE_DOMU_AGL_IVI=undefined
 ENABLE_DOMU_AGL_IC=undefined
+ENABLE_ZEPHYR=no
 
 Usage() {
     echo "Usage:"
@@ -21,12 +22,13 @@ Usage() {
     echo "    -u: Using DomU(Default is disable)"
     echo "    -v: Enable Virtio backend on DomD(Default is disabled)"
     echo "    -r: Enable rm_work on Yocto build"
+    echo "    -z: Build Zephyr images"
     echo "    -h: Show this usage"
 }
 
 # Proc arguments
 OPTIND=1
-while getopts "acghuvr" OPT
+while getopts "acghuvrz" OPT
 do
     case $OPT in
         a) USING_DOMA=yes; ENABLE_VIRTIO=yes ;;
@@ -34,6 +36,7 @@ do
         u) USING_DOMU=yes;;
         v) ENABLE_VIRTIO=yes;;
         r) INHERIT_RM_WORK=yes;;
+        z) ENABLE_ZEPHYR=yes;;
         h) Usage; exit;;
         *) echo -e "\e[31mERROR: Unsupported option\e[m"; Usage; exit;;
     esac
@@ -99,6 +102,7 @@ moulin prod-devel-rcar4_new.yaml \
     --ADD_META_TEST yes \
     --ENABLE_DOMU_AGL_IVI ${ENABLE_DOMU_AGL_IVI} \
     --ENABLE_DOMU_AGL_IC ${ENABLE_DOMU_AGL_IC} \
+    --ENABLE_ZEPHYR ${ENABLE_ZEPHYR} \
 
 
 if [[ "${INHERIT_RM_WORK}" == "yes" ]]; then
