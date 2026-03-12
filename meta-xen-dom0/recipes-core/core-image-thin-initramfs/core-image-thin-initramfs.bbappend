@@ -2,18 +2,10 @@ DEPENDS += "u-boot-mkimage-native dtc-native"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 inherit deploy
-inherit externalsrc
-EXTERNALSRC_SYMLINKS = ""
 
-generate_uboot_image() {
-    uboot-mkimage -A arm64 -O linux -T ramdisk -C gzip -n "uInitramfs" \
-        -d ${IMGDEPLOYDIR}/${IMAGE_NAME}.cpio.gz  ${IMGDEPLOYDIR}/${IMAGE_NAME}.cpio.gz.uInitramfs
-    ln -sfr  ${IMGDEPLOYDIR}/${IMAGE_NAME}.cpio.gz.uInitramfs ${DEPLOY_DIR_IMAGE}/uInitramfs
-}
-
-IMAGE_POSTPROCESS_COMMAND += " generate_uboot_image; "
 IMAGE_ROOTFS_SIZE = "65535"
 INITRAMFS_MAXSIZE = "262144"
+CPIO_INPUT="${WORKDIR}/deploy-${IMAGE_BASENAME}-image-complete/${IMAGE_LINK_NAME}.cpio.gz"
 
 # do_unpack is not supported with inherit core-image.
 # Thus, we need to copy file manually.
@@ -62,5 +54,4 @@ generate_fit_image() {
     mkimage -f ./fit-image.its ${DEPLOY_DIR_IMAGE}/fitImage
 }
 
-IMAGE_POSTPROCESS_COMMAND += " generate_fit_image"
-
+addtask do_deploy after do_image_complete before do_build
