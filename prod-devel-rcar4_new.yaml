@@ -778,4 +778,3 @@ parameters:
                 type: raw_image
                 gpt_type: 0FC63DAF-8483-4772-8E79-3D69D8477DE4 # Linux filesystem data
                 image_path: "%{YOCTOS_WORK_DIR}/../../../../agl/build/tmp/deploy/images/%{AGL_GUEST_MACHINE}/%{AGL_GUEST_IMAGE_IC}-%{AGL_GUEST_MACHINE}.rootfs.ext4"
-
