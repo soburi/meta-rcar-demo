@@ -57,3 +57,24 @@ python __anonymous () {
 # For dt-overlay
 KERNEL_DTC_FLAGS += "-@"
 
+do_deploy:append() {
+    local versioned_dtb
+
+    if [ ! -e "${DEPLOYDIR}/Image" ] && [ -e "${DEPLOYDIR}/Image-${MACHINE}.bin" ]; then
+        ln -sf Image-${MACHINE}.bin ${DEPLOYDIR}/Image
+    fi
+
+    if [ ! -e "${DEPLOYDIR}/${XT_DOMD_DTB_NAME}" ]; then
+        versioned_dtb=$(ls -1 "${DEPLOYDIR}/${XT_DOMD_DTB_NAME%.dtb}--"*.dtb 2>/dev/null | head -n1 || true)
+        if [ -n "${versioned_dtb}" ]; then
+            ln -sf "$(basename "${versioned_dtb}")" "${DEPLOYDIR}/${XT_DOMD_DTB_NAME}"
+        fi
+    fi
+
+    if [ ! -e "${DEPLOYDIR}/${XT_XEN_DTB_NAME}" ]; then
+        versioned_dtb=$(ls -1 "${DEPLOYDIR}/${XT_XEN_DTB_NAME%.dtb}--"*.dtb 2>/dev/null | head -n1 || true)
+        if [ -n "${versioned_dtb}" ]; then
+            ln -sf "$(basename "${versioned_dtb}")" "${DEPLOYDIR}/${XT_XEN_DTB_NAME}"
+        fi
+    fi
+}
