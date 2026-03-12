@@ -9,6 +9,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI = "\
     file://zephyr_blinky.conf \
+    file://zephyr_blinky2.conf \
 "
 
 S = "${WORKDIR}"
@@ -18,11 +19,14 @@ ZEPHYR_DEPLOY_DIR = "${TOPDIR}/tmp/deploy/images/${ZEPHYR_DEPLOY_MACHINE}"
 
 FILES:${PN} = " \
     ${sysconfdir}/xen/zephyr_blinky.conf \
+    ${sysconfdir}/xen/zephyr_blinky2.conf \
     ${libdir}/xen/boot/zephyr_blinky.bin \
+    ${libdir}/xen/boot/zephyr_blinky2.bin \
 "
 
 do_install[depends] += " \
     zephyr-blinky:do_deploy \
+    zephyr-blinky2:do_deploy \
 "
 
 do_install() {
@@ -30,5 +34,7 @@ do_install() {
     install -d ${D}${libdir}/xen/boot
 
     install -m 0644 ${WORKDIR}/zephyr_blinky.conf ${D}${sysconfdir}/xen/zephyr_blinky.conf
+    install -m 0644 ${WORKDIR}/zephyr_blinky2.conf ${D}${sysconfdir}/xen/zephyr_blinky2.conf
     install -m 0644 ${ZEPHYR_DEPLOY_DIR}/zephyr_blinky.bin ${D}${libdir}/xen/boot/zephyr_blinky.bin
+    install -m 0644 ${ZEPHYR_DEPLOY_DIR}/zephyr_blinky2.bin ${D}${libdir}/xen/boot/zephyr_blinky2.bin
 }
