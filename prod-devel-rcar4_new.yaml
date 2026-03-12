@@ -4,7 +4,6 @@ min_ver: "0.15"
 variables:
   YOCTOS_WORK_DIR: "yocto"
   DOM0_BUILD_DIR: "build-dom0"
-  DOMD_BUILD_DIR: "build-domd"
   DOMU_BUILD_DIR: "build-domu"
   XT_DOMD_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-domd.dtb"
   XT_DOMU_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-domu.dtb"
@@ -113,36 +112,34 @@ components:
     default: true
     sources:
       - *COMMON_SOURCES
+      - type: git
+        url: git://git.yoctoproject.org/meta-selinux
+        rev: scarthgap
     builder:
       type: yocto
       work_dir: "%{DOM0_BUILD_DIR}"
       conf:
+        - [BBMULTICONFIG, "dom0 domd"]
         - *COMMON_CONF
-        - [MACHINE, "generic-armv8-xt"]
-        - [XT_DOM_NAME, "dom0"]
+        - [MACHINE, "sparrow-hawk"]
         - [XT_DOMD_CONFIG_NAME, "%{XT_DOMD_CONFIG_NAME}"]
-        - [DOMD_MACHINE, "%{MACHINE}"]
-        - [XT_DOMU_CONFIG_NAME, "%{XT_DOMU_CONFIG_NAME}"]
         - [XT_DOMD_DTB_NAME, "%{XT_DOMD_DTB_NAME}"]
-        - [XT_GUEST_INSTALL, "%{XT_GENERIC_DOMU_TAG} %{XT_DOMA_TAG} %{XT_DOMAGL_IVI_TAG} %{XT_DOMAGL_IC_TAG} domd"]
-        - [XT_AUTOSTART_DOMA, "%{XT_AUTOSTART_DOMA}"]
-        - [XT_AUTOSTART_DOMU, "%{XT_AUTOSTART_DOMU}"]
-        - [XT_AUTOSTART_DOMAGL_IVI, "%{XT_AUTOSTART_DOMAGL_IVI}"]
-        - [XT_AUTOSTART_DOMAGL_IC, "%{XT_AUTOSTART_DOMAGL_IC}"]
-
-        # Disable HWDB which quite huge (around 15MB) and is not required at all
-        - [BAD_RECOMMENDATIONS:append, " udev-hwdb"]
-
-        # Enable systemd on dom0
+        - [XT_DEVICE_TREES, "%{XT_DOMD_DTB_NAME}"]
+        - [MACHINE_EXTRA_RRECOMMENDS:remove, "linux-fitimage"]
         - [DISTRO_FEATURES:append, " usrmerge systemd"]
         - [VIRTUAL-RUNTIME_init_manager, "systemd"]
-
-        # Do not install kernel image to rootfs to decrease initrd size
-        - ["RRECOMMENDS:${KERNEL_PACKAGE_NAME}-base", ""]
-
+        - [BB_MULTI_PROVIDER_ALLOWED:append, " virtual/libgl virtual/egl virtual/libgles1 virtual/libgles2"]
+        - [PREFERRED_PROVIDER_virtual/libgles1, ""]
+        - [PREFERRED_PROVIDER_virtual/libgles2, "gles-user-module"]
+        - [PREFERRED_PROVIDER_virtual/egl, "libegl"]
+        - [PREFERRED_PROVIDER_virtual/libgl, ""]
+        - [PREFERRED_PROVIDER_virtual/mesa, ""]
+        - [PREFERRED_PROVIDER_virtual/libgbm, "libgbm"]
+        - [PREFERRED_PROVIDER_libgbm-dev, "libgbm"]
 
       layers:
         - "../meta-virtualization"
+        - "../meta-selinux"
         - "../meta-openembedded/meta-oe"
         - "../meta-openembedded/meta-filesystems"
         - "../meta-openembedded/meta-python"
@@ -150,53 +147,13 @@ components:
         - "../meta-xt-common/meta-xt-control-domain"
         - "../meta-xt-common/meta-xt-dom0"
         - "../meta-xt-common/meta-xt-domx"
-      build_target: sodev-full-image
-      external_src:
-        domd: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/"
-      additional_deps:
-        - "%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/Image"
-      target_images:
-        - "tmp/deploy/images/generic-armv8-xt/Image"
-        - "tmp/deploy/images/generic-armv8-xt/uInitramfs"
-  domd:
-    build-dir: "%{YOCTOS_WORK_DIR}"
-    sources:
-      - *COMMON_SOURCES
-      - type: git
-        url: git://git.yoctoproject.org/meta-selinux
-        rev: scarthgap
-    builder:
-      type: yocto
-      work_dir: "%{DOMD_BUILD_DIR}"
-      conf:
-        - *COMMON_CONF
-        - *DOMD_DOMU_CONF
-        - [XT_DOM_NAME, "domd"]
-        - [XT_DEVICE_TREES, "%{XT_DOMD_DTB_NAME} %{XT_XEN_DTB_NAME} %{XT_DOMA_DTB_NAME}"]
-        - [XT_GUEST_INSTALL, "%{XT_GENERIC_DOMU_TAG} %{XT_DOMA_TAG} %{XT_DOMAGL_IVI_TAG} %{XT_DOMAGL_IC_TAG}"]
-        - [IMAGE_INSTALL:append, " iperf3"]
-        - [IMAGE_INSTALL:append, " smcroute"]
-        - [IMAGE_INSTALL:append, " snort"]
-
-      build_target: core-image-weston initramfs-image
-      layers:
-        - "../meta-virtualization"
-        - "../meta-selinux"
-        - "../meta-openembedded/meta-oe"
-        - "../meta-openembedded/meta-networking"
-        - "../meta-openembedded/meta-python"
-        - "../meta-openembedded/meta-filesystems"
-        - "../meta-xt-common/meta-xt-domx"
         - "../meta-xt-common/meta-xt-driver-domain"
         - "../meta-xt-common/meta-xt-security"
+      build_target: mc:dom0:sodev-full-image
       target_images:
-        - "tmp/deploy/images/%{MACHINE}/Image"
-        - "tmp/deploy/images/%{MACHINE}/core-image-weston-%{MACHINE}.rootfs.ext4"
-        - "tmp/deploy/images/%{MACHINE}/bl31-%{MACHINE}.srec"
-        - "tmp/deploy/images/%{MACHINE}/u-boot-elf-%{MACHINE}.srec"
-        - "tmp/deploy/images/%{MACHINE}/xen-%{MACHINE}"
-        - "tmp/deploy/images/%{MACHINE}/xenpolicy-4.19-unstable"
-        - "tmp/deploy/images/%{MACHINE}/%{XT_XEN_DTB_NAME}"
+        - "tmp-dom0/deploy/images/%{MACHINE}/fitImage"
+        - "tmp-domd/deploy/images/%{MACHINE}/ipl-burning/flash.bin"
+        - "tmp-domd/deploy/images/%{MACHINE}/core-image-weston-%{MACHINE}.rootfs.ext4"
   domu:
     build-dir: "%{YOCTOS_WORK_DIR}"
     sources:
@@ -291,13 +248,9 @@ components:
       type: archive
       name: "%{MACHINE}-boot-artifacts.tar.bz"
       items:
-        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp/deploy/images/generic-armv8-xt/Image"
-        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp/deploy/images/generic-armv8-xt/uInitramfs"
-        - "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/bl31-%{MACHINE}.srec"
-        - "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/u-boot-elf-%{MACHINE}.srec"
-        - "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/xen-%{MACHINE}"
-        - "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/xenpolicy-4.19-unstable"
-        - "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/%{XT_XEN_DTB_NAME}"
+        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{MACHINE}/fitImage"
+        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/ipl-burning/flash.bin"
+        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/core-image-weston-%{MACHINE}.rootfs.ext4"
 
 images:
   full:
@@ -311,7 +264,7 @@ images:
       domd_rootfs:
         gpt_type: B921B045-1DF0-41C3-AF44-4C6F280D3FAE # Linux aarch64 root
         type: raw_image
-        image_path: "%{YOCTOS_WORK_DIR}/build-domd/tmp/deploy/images/%{MACHINE}/core-image-weston-%{MACHINE}.rootfs.ext4"
+        image_path: "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/core-image-weston-%{MACHINE}.rootfs.ext4"
 
 parameters:
   ENABLE_DOMU:
@@ -348,10 +301,6 @@ parameters:
           SOC_FAMILY: "r8a779g3"
         components:
           dom0:
-            builder:
-              layers:
-                - "../meta-sparrow-hawk"
-          domd:
             sources:
               - type: git
                 url: https://github.com/rcar-community/meta-sparrow-hawk
@@ -375,25 +324,11 @@ parameters:
             builder:
               layers:
                 - "../../../meta-xen-dom0"
-                - "../../../meta-xen-domx"
-                - "../meta-openembedded/meta-multimedia"
-              external_src:
-                core-image-thin-initramfs: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/"
-              conf:
-                - [XT_XEN_DTB_NAME, "%{XT_XEN_DTB_NAME}"]
-              target_images:
-                - "tmp/deploy/images/generic-armv8-xt/fitImage"
-          domd:
-            builder:
-              layers:
                 - "../../../meta-xen-domd"
                 - "../../../meta-xen-domx"
                 - "../meta-openembedded/meta-multimedia"
               conf:
-                - [IMAGE_INSTALL:append, " iperf3 htop tcpdump coreutils ethtool"]
-                - [MACHINE_EXTRA_RRECOMMENDS:remove, "linux-fitimage"]
-              target_images:
-                - "tmp/deploy/images/%{MACHINE}/flash.bin"
+                - [XT_XEN_DTB_NAME, "%{XT_XEN_DTB_NAME}"]
           domu:
             builder:
               layers:
@@ -425,9 +360,9 @@ parameters:
             partitions:
               boot:
                 items:
-                  "flash.bin": "%{YOCTOS_WORK_DIR}/build-domd/tmp/deploy/images/%{MACHINE}/flash.bin"
-                  "fitImage": "%{YOCTOS_WORK_DIR}/build-dom0/tmp/deploy/images/generic-armv8-xt/fitImage"
-                  "/boot/fitImage": "%{YOCTOS_WORK_DIR}/build-dom0/tmp/deploy/images/generic-armv8-xt/fitImage"
+                  "flash.bin": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/ipl-burning/flash.bin"
+                  "fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{MACHINE}/fitImage"
+                  "/boot/fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{MACHINE}/fitImage"
 
   USE_GRAPHICS_PACKAGE:
     desc: "Enable GPU on DomD"
@@ -435,21 +370,10 @@ parameters:
       desc: "Nothing to do"
       overrides:
         components:
-          domd:
+          dom0:
             builder:
               conf:
-                # Use CPU rendering
-                - [IMAGE_INSTALL:append, " mesa"]
-                - [DISTRO_FEATURES_NATIVESDK:append, " wayland x11"]
-                - [DISTRO_FEATURES:append, " pam wayland"]
-                - [DISTRO_FEATURES:remove, " ptest x11 vulkan"]
-                # Mask graphic Pkgs
-                - [BBMASK, "kernel-module-gles|user-module-gles"]
-                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/wayland-wsegl"]
-                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/wayland-kms"]
-                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/libgbm"]
-                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/weston_%.bbappend"]
-                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/packagegroups/packagegroup-renesas-graphics.bb"]
+                - [XT_DOMD_USE_CPU_GRAPHICS, "1"]
     "yes":
       default: true
       overrides:
@@ -459,24 +383,10 @@ parameters:
               conf:
                 # Enable Gfx Pkgs
                 - [MACHINE_FEATURES:append, " gsx"]
-          domd:
-            builder:
+                - [XT_DOMD_USE_CPU_GRAPHICS, "0"]
+                - [MACHINE_FEATURES:append:mc:domd, " gsx"]
               layers:
                 - "../../../meta-xen-domd-gfx"
-              conf:
-                # Enable Gfx Pkgs
-                - [MACHINE_FEATURES:append, " gsx"]
-                # Enable Wayland/Weston
-                - [DISTRO_FEATURES_NATIVESDK:append, " wayland"]
-                - [DISTRO_FEATURES:append, " pam wayland"]
-                - [BB_MULTI_PROVIDER_ALLOWED:append, "virtual/libgl virtual/egl virtual/libgles1 virtual/libgles2"]
-                - [PREFERRED_PROVIDER_virtual/libgles1, ""]
-                - [PREFERRED_PROVIDER_virtual/libgles2, "user-module-gles"]
-                - [PREFERRED_PROVIDER_virtual/egl, "libegl"]
-                - [PREFERRED_PROVIDER_virtual/libgl, ""]
-                - [PREFERRED_PROVIDER_virtual/mesa, ""]
-                - [PREFERRED_PROVIDER_virtual/libgbm, "libgbm"]
-                - [PREFERRED_PROVIDER_libgbm-dev, "libgbm"]
 
   ENABLE_VIRTIO:
     desc: "Add meta-test layer and some configs"
@@ -500,7 +410,9 @@ parameters:
             builder:
               layers:
                 - "../meta-xt-common/meta-xt-control-domain-virtio"
+                - "../meta-xt-common/meta-xt-driver-domain-virtio"
                 - "../meta-xt-common/meta-xt-qemu"
+                - "../../../meta-xen-domd-virtio"
               conf:
                 - [OVERRIDES:append, ":enable_virtio"]
                 - [DISTRO_FEATURES:append, " enable_virtio"]
@@ -508,17 +420,10 @@ parameters:
                 - [IMAGE_INSTALL:remove, "qemu-system-aarch64"]
                 - [XT_DOMU_CONFIG_NAME, "domu-virtio.cfg"]
                 - [QEMUVERSION, "7.0%"]
-          domd:
-            builder:
-              layers:
-                - "../meta-xt-common/meta-xt-driver-domain-virtio"
-                - "../meta-xt-common/meta-xt-qemu"
-                - "../../../meta-xen-domd-virtio"
-              conf:
-                - [DISTRO_FEATURES:append, " enable_virtio"]
-                - [DISTRO_FEATURES:append, " xen vmsep"]
-                - [QEMUVERSION, "7.0%"]
-                - [BBMASK:append, " meta-xt-common/meta-xt-driver-domain-virtio/recipes-extended/xen/"]
+                - [DISTRO_FEATURES:append:mc:domd, " enable_virtio"]
+                - [DISTRO_FEATURES:append:mc:domd, " xen vmsep"]
+                - [QEMUVERSION:mc:domd, "7.0%"]
+                - [BBMASK:append:mc:domd, " meta-xt-common/meta-xt-driver-domain-virtio/recipes-extended/xen/"]
 
   ENABLE_DOMU_VIRTIO:
     desc: "Build Linux as a guest VM using Virtio backend"
@@ -616,20 +521,6 @@ parameters:
           XT_DOMA_DTB_NAME: "doma-virtio.dtb"
         components:
           dom0:
-            builder:
-              conf:
-                - [XT_DOMA_DTB_NAME, "%{XT_DOMA_DTB_NAME}"]
-                - [XT_DOMA_CONFIG_NAME, "%{XT_DOMA_CONFIG_NAME}"]
-                # Flag, which allows to override parameters on the Yocto level.
-                # E.g. amount of used RAM for driver domain.
-                - [OVERRIDES:append, ":enable_android"]
-              additional_deps:
-                # This is not actually a hard dep. We just want to force Android build
-                - "../%{DOMA_DIR}/out/target/product/%{ANDROID_DEVICE}/boot.img"
-              external_src:
-                # Android uses DTB generated by DomD
-                doma: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/"
-          domd:
             sources:
               - type: git
                 url: https://github.com/kraj/meta-clang.git
@@ -639,11 +530,18 @@ parameters:
                 - "../meta-clang"
                 - "../../%{DOMA_DIR}/device/epam/aosp-xenvm-trout/agl_services_build/yocto-layer/meta-google"
               conf:
-                - [BBMASK:append, "|meta-google/recipes-trout/images/rcar-image-adas.bbappend"]
+                - [XT_DOMA_DTB_NAME, "%{XT_DOMA_DTB_NAME}"]
+                - [XT_DOMA_CONFIG_NAME, "%{XT_DOMA_CONFIG_NAME}"]
+                # Flag, which allows to override parameters on the Yocto level.
+                # E.g. amount of used RAM for driver domain.
+                - [OVERRIDES:append, ":enable_android"]
+                - [BBMASK:append:mc:domd, "|meta-google/recipes-trout/images/rcar-image-adas.bbappend"]
               additional_deps:
-                # We need some dependency to AOSP artifacts as we are using the "meta-google"
-                # layer directly from its source code. Thus DomA should be built before DomD.
+                # This is not actually a hard dep. We just want to force Android build
                 - "../%{DOMA_DIR}/out/target/product/%{ANDROID_DEVICE}/boot.img"
+              external_src:
+                # Android uses DTB generated by DomD
+                doma: "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/"
         images:
           android_only: &ANDROID_IMAGE
             desc: "Android sub-image (this image is passed to Android VM as a separate block device)"

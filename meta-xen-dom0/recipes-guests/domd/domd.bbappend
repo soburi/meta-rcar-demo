@@ -1,19 +1,37 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-RDEPENDS:append:sparrow-hawk = " dtc"
+RDEPENDS:${PN}:append:sparrow-hawk = " dtc"
+DOMD_DEPLOY_DIR = "${TOPDIR}/tmp-domd/deploy/images/${MACHINE}"
+DOMD_INITRAMFS_DEPLOY_NAME = "initramfs-image-${MACHINE}.rootfs.cpio.gz"
+
+do_install[mcdepends] += " \
+    mc:dom0:domd:virtual/kernel:do_deploy \
+    mc:dom0:domd:initramfs-image:do_image_complete \
+"
 
 SRC_URI:append = "\
     file://domd-set-root \
 "
 FILES:${PN}:append = " \
     ${libdir}/xen/bin/domd-set-root \
-    ${libdir}/xen/boot/initramfs-domd.cpio.gz \
+    ${libdir}/xen/boot/${DOMD_INITRAMFS_DEPLOY_NAME} \
     ${libdir}/xen/boot/*.dtbo \
 "
 
 CFG_FILE="${D}${sysconfdir}/xen/domd.cfg"
 
-do_install:append() {
+do_install() {
+    install -d ${D}${sysconfdir}/xen
+    install -d ${D}${libdir}/xen/boot
+    install -d ${D}${systemd_unitdir}/system
+    install -d ${D}${libdir}/xen/bin
+
+    install -m 0644 ${WORKDIR}/${XT_DOMD_CONFIG_NAME} ${D}${sysconfdir}/xen/domd.cfg
+    install -m 0644 ${DOMD_DEPLOY_DIR}/${XT_DOMD_DTB_NAME} ${D}${libdir}/xen/boot/domd.dtb
+    install -m 0644 ${DOMD_DEPLOY_DIR}/Image ${D}${libdir}/xen/boot/linux-domd
+    install -m 0644 ${WORKDIR}/domd.service ${D}${systemd_unitdir}/system/
+    install -m 0744 ${WORKDIR}/domd-set-root ${D}${libdir}/xen/bin
+
     if ${@bb.utils.contains('DISTRO_FEATURES', 'enable_virtio', 'true', 'false', d)}; then
         echo "" >> ${CFG_FILE}
         echo "driver_domain = 1" >> ${CFG_FILE}
@@ -27,21 +45,16 @@ do_install:append() {
         sed -i "s/\[VIRTIO_EXTRA_PARAMETERS\]//" ${CFG_FILE}
     fi
 
-    # Install domd-set-root script
-    install -d ${D}${libdir}/xen/bin
-    install -m 0744 ${WORKDIR}/domd-set-root ${D}${libdir}/xen/bin
-
     # Call domd-set-root script before launching domain
     echo "[Service]" >> ${D}${systemd_unitdir}/system/domd.service
     echo "ExecStartPre=${libdir}/xen/bin/domd-set-root" >> ${D}${systemd_unitdir}/system/domd.service
 
     # Add initramfs
-    install -m 0644 ${S}/initramfs-domd.cpio.gz ${D}${libdir}/xen/boot/initramfs-domd.cpio.gz
+    install -m 0644 ${DOMD_DEPLOY_DIR}/${DOMD_INITRAMFS_DEPLOY_NAME} ${D}${libdir}/xen/boot/${DOMD_INITRAMFS_DEPLOY_NAME}
 
     # install dtbo for DomD
-    for f in ${S}/*.dtbo; do
+    for f in ${DOMD_DEPLOY_DIR}/*.dtbo; do
         [ -e "$f" ] || continue
         install -m 0644 "$f" ${D}${libdir}/xen/boot/
     done
 }
-

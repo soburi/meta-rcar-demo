@@ -4,6 +4,14 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 inherit deploy
 inherit externalsrc
 EXTERNALSRC_SYMLINKS = ""
+DOMD_DEPLOY_DIR = "${TOPDIR}/tmp-domd/deploy/images/${MACHINE}"
+
+do_image_complete[mcdepends] += " \
+    mc:dom0:domd:virtual/kernel:do_deploy \
+    mc:dom0:domd:xen:do_deploy \
+    mc:dom0:domd:xen-tools:do_deploy \
+    mc:dom0:domd:arm-trusted-firmware:do_deploy \
+"
 
 generate_uboot_image() {
     uboot-mkimage -A arm64 -O linux -T ramdisk -C gzip -n "uInitramfs" \
@@ -50,10 +58,10 @@ generate_fit_image() {
     cd ${WORKDIR}
     cp -f ${DEPLOY_DIR_IMAGE}/Image ./Image
     cp -f ${IMGDEPLOYDIR}/${IMAGE_NAME}.cpio.gz ./uInitramfs
-    cp -f ${S}/xen-*.efi ./xen
-    cp -f ${S}/xenpolicy-4.* ./xenpolicy
-    cp -f ${S}/${XT_XEN_DTB_NAME} ./xen.dtb
-    cp -f ${S}/bl31-*.bin ./bl31.bin
+    cp -f ${DOMD_DEPLOY_DIR}/xen-${MACHINE}.efi ./xen
+    cp -f ${DOMD_DEPLOY_DIR}/xenpolicy-${MACHINE} ./xenpolicy
+    cp -f ${DOMD_DEPLOY_DIR}/${XT_XEN_DTB_NAME} ./xen.dtb
+    cp -f ${DOMD_DEPLOY_DIR}/bl31-${MACHINE}.bin ./bl31.bin
 
     echo "" > ./fit-image-extra.its
 
@@ -63,4 +71,3 @@ generate_fit_image() {
 }
 
 IMAGE_POSTPROCESS_COMMAND += " generate_fit_image"
-
