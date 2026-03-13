@@ -134,7 +134,6 @@ components:
         - [XT_AUTOSTART_DOMU:mc:dom0, "%{XT_AUTOSTART_DOMU}"]
         - [XT_AUTOSTART_DOMAGL_IVI:mc:dom0, "%{XT_AUTOSTART_DOMAGL_IVI}"]
         - [XT_AUTOSTART_DOMAGL_IC:mc:dom0, "%{XT_AUTOSTART_DOMAGL_IC}"]
-        - [XT_GUEST_INSTALL:mc:dom0, "domd"]
         - [MACHINE_EXTRA_RRECOMMENDS:remove, "linux-fitimage"]
 
       layers:
