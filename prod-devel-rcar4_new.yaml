@@ -121,6 +121,7 @@ components:
         - [MACHINE, "generic-armv8-xt"]
         - [XT_DOM_NAME, "dom0"]
         - [XT_DOMD_CONFIG_NAME, "%{XT_DOMD_CONFIG_NAME}"]
+        - [DOMD_MACHINE, "%{MACHINE}"]
         - [XT_DOMU_CONFIG_NAME, "%{XT_DOMU_CONFIG_NAME}"]
         - [XT_DOMD_DTB_NAME, "%{XT_DOMD_DTB_NAME}"]
         - [XT_GUEST_INSTALL, "%{XT_GENERIC_DOMU_TAG} %{XT_DOMA_TAG} %{XT_DOMAGL_IVI_TAG} %{XT_DOMAGL_IC_TAG} domd"]
@@ -149,7 +150,7 @@ components:
         - "../meta-xt-common/meta-xt-control-domain"
         - "../meta-xt-common/meta-xt-dom0"
         - "../meta-xt-common/meta-xt-domx"
-      build_target: core-image-thin-initramfs
+      build_target: sodev-full-image
       external_src:
         domd: "%{YOCTOS_WORK_DIR}/%{DOMD_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/"
       additional_deps:
