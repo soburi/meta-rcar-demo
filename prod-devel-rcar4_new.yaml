@@ -101,7 +101,6 @@ components:
         - [XT_AUTOSTART_DOMU:mc:dom0, "%{XT_AUTOSTART_DOMU}"]
         - [XT_AUTOSTART_DOMAGL_IVI:mc:dom0, "%{XT_AUTOSTART_DOMAGL_IVI}"]
         - [XT_AUTOSTART_DOMAGL_IC:mc:dom0, "%{XT_AUTOSTART_DOMAGL_IC}"]
-        - [XT_GUEST_INSTALL:mc:dom0, "domd"]
         - [MACHINE_EXTRA_RRECOMMENDS:remove, "linux-fitimage"]
 
       layers:
@@ -239,4 +238,4 @@ parameters:
               conf:
                 - [ZEPHYR_TOOLCHAIN_VARIANT, "zephyr"]
                 - [ZEPHYR_SDK_EXTERNAL, "0"]
-                - [XT_GUEST_INSTALL:append:mc:dom0, " domz"]
+                - [XT_GUEST_INSTALL:append, " domz"]
