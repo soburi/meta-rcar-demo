@@ -126,14 +126,9 @@ components:
         - [BBMULTICONFIG, "dom0 domd"]
         - [MACHINE, "sparrow-hawk"]
         - [XT_DOMD_CONFIG_NAME, "%{XT_DOMD_CONFIG_NAME}"]
-        - [XT_DOMU_CONFIG_NAME:mc:dom0, "%{XT_DOMU_CONFIG_NAME}"]
         - [XT_DOMD_DTB_NAME, "%{XT_DOMD_DTB_NAME}"]
         - [XT_XEN_DTB_NAME, "%{XT_XEN_DTB_NAME}"]
         - [XT_DEVICE_TREES, "%{XT_DOMD_DTB_NAME} %{XT_XEN_DTB_NAME}"]
-        - [XT_AUTOSTART_DOMA:mc:dom0, "%{XT_AUTOSTART_DOMA}"]
-        - [XT_AUTOSTART_DOMU:mc:dom0, "%{XT_AUTOSTART_DOMU}"]
-        - [XT_AUTOSTART_DOMAGL_IVI:mc:dom0, "%{XT_AUTOSTART_DOMAGL_IVI}"]
-        - [XT_AUTOSTART_DOMAGL_IC:mc:dom0, "%{XT_AUTOSTART_DOMAGL_IC}"]
         - [MACHINE_EXTRA_RRECOMMENDS:remove, "linux-fitimage"]
 
       layers:
