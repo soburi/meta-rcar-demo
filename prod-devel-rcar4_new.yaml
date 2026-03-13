@@ -185,16 +185,6 @@ parameters:
           dom0:
             builder:
               conf:
-                - [IMAGE_INSTALL:append:mc:domd, " mesa"]
-                - [DISTRO_FEATURES_NATIVESDK:append, " wayland x11"]
-                - [DISTRO_FEATURES:append, " pam wayland"]
-                - [DISTRO_FEATURES:remove, " ptest x11 vulkan"]
-                - [BBMASK, "kernel-module-gles|user-module-gles"]
-                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/wayland-wsegl"]
-                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/wayland-kms"]
-                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/libgbm"]
-                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/weston_%.bbappend"]
-                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/packagegroups/packagegroup-renesas-graphics.bb"]
                 - [XT_DOMD_USE_CPU_GRAPHICS, "1"]
     "yes":
       default: true
@@ -205,16 +195,6 @@ parameters:
               conf:
                 # Enable Gfx Pkgs
                 - [MACHINE_FEATURES:append, " gsx"]
-                - [DISTRO_FEATURES_NATIVESDK:append, " wayland"]
-                - [DISTRO_FEATURES:append, " pam wayland"]
-                - [BB_MULTI_PROVIDER_ALLOWED:append, "virtual/libgl virtual/egl virtual/libgles1 virtual/libgles2"]
-                - [PREFERRED_PROVIDER_virtual/libgles1, ""]
-                - [PREFERRED_PROVIDER_virtual/libgles2, "user-module-gles"]
-                - [PREFERRED_PROVIDER_virtual/egl, "libegl"]
-                - [PREFERRED_PROVIDER_virtual/libgl, ""]
-                - [PREFERRED_PROVIDER_virtual/mesa, ""]
-                - [PREFERRED_PROVIDER_virtual/libgbm, "libgbm"]
-                - [PREFERRED_PROVIDER_libgbm-dev, "libgbm"]
                 - [XT_DOMD_USE_CPU_GRAPHICS, "0"]
               layers:
                 - "../../../meta-xen-domd-gfx"
