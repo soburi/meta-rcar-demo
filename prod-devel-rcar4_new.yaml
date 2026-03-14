@@ -87,16 +87,15 @@ components:
       type: yocto
       work_dir: "%{DOM0_BUILD_DIR}"
       conf:
-        - *COMMON_CONF
-        - [DISTRO_FEATURES:append, " usrmerge systemd"]
-        - [VIRTUAL-RUNTIME_init_manager, "systemd"]
         - [BBMULTICONFIG, "dom0 domd"]
+        - *COMMON_CONF
         - [MACHINE, "sparrow-hawk"]
         - [XT_DOMD_CONFIG_NAME, "%{XT_DOMD_CONFIG_NAME}"]
         - [XT_DOMD_DTB_NAME, "%{XT_DOMD_DTB_NAME}"]
-        - [XT_XEN_DTB_NAME, "%{XT_XEN_DTB_NAME}"]
-        - [XT_DEVICE_TREES, "%{XT_DOMD_DTB_NAME} %{XT_XEN_DTB_NAME}"]
+        - [XT_DEVICE_TREES, "%{XT_DOMD_DTB_NAME}"]
         - [MACHINE_EXTRA_RRECOMMENDS:remove, "linux-fitimage"]
+        - [DISTRO_FEATURES:append, " usrmerge systemd"]
+        - [VIRTUAL-RUNTIME_init_manager, "systemd"]
 
       layers:
         - "../meta-virtualization"
@@ -162,6 +161,9 @@ parameters:
                 - "../../../meta-xen-domd"
                 - "../../../meta-xen-domx"
                 - "../meta-openembedded/meta-multimedia"
+              conf:
+                - [XT_XEN_DTB_NAME, "%{XT_XEN_DTB_NAME}"]
+                - [XT_DEVICE_TREES:append:mc:domd, " %{XT_XEN_DTB_NAME}"]
         images:
           full:
             partitions:
