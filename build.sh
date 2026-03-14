@@ -12,6 +12,7 @@ CLEAN_BUILD_TEST=no
 INHERIT_RM_WORK=no
 ENABLE_DOMU_AGL_IVI=undefined
 ENABLE_DOMU_AGL_IC=undefined
+ENABLE_ZEPHYR=no
 
 Usage() {
     echo "Usage:"
@@ -22,6 +23,7 @@ Usage() {
     echo "    -u, --domu: Using DomU(Default is disable)"
     echo "    -v, --virtio: Enable Virtio backend on DomD(Default is disabled)"
     echo "    -r, --rm-work: Enable rm_work on Yocto build"
+    echo "    -z, --zephyr, --enable-zephyr: Build Zephyr images"
     echo "        --enable-domu-agl-ivi: Enable DomU AGL-IVI guest"
     echo "        --disable-domu-agl-ivi: Disable DomU AGL-IVI guest"
     echo "        --enable-domu-agl-ic: Enable DomU AGL-Cluster guest"
@@ -37,6 +39,7 @@ set_option() {
         u) USING_DOMU=yes ;;
         v) ENABLE_VIRTIO=yes ;;
         r) INHERIT_RM_WORK=yes ;;
+        z) ENABLE_ZEPHYR=yes ;;
         h) Usage; exit 0 ;;
         *) echo -e "\e[31mERROR: Unsupported option '-$1'\e[m"; Usage; exit 1 ;;
     esac
@@ -50,6 +53,7 @@ do
         --domu) set_option u ;;
         --virtio) set_option v ;;
         --rm-work) set_option r ;;
+        --zephyr|--enable-zephyr) set_option z ;;
         --enable-domu-agl-ivi) ENABLE_DOMU_AGL_IVI=yes ;;
         --disable-domu-agl-ivi) ENABLE_DOMU_AGL_IVI=no ;;
         --enable-domu-agl-ic) ENABLE_DOMU_AGL_IC=yes ;;
@@ -141,6 +145,7 @@ moulin prod-devel-rcar4_new.yaml \
     --ADD_META_TEST yes \
     --ENABLE_DOMU_AGL_IVI ${ENABLE_DOMU_AGL_IVI} \
     --ENABLE_DOMU_AGL_IC ${ENABLE_DOMU_AGL_IC} \
+    --ENABLE_ZEPHYR ${ENABLE_ZEPHYR} \
 
 
 if [[ "${INHERIT_RM_WORK}" == "yes" ]]; then

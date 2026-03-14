@@ -778,3 +778,24 @@ parameters:
                 gpt_type: 0FC63DAF-8483-4772-8E79-3D69D8477DE4 # Linux filesystem data
                 image_path: "%{YOCTOS_WORK_DIR}/../../../../agl/build/tmp/deploy/images/%{AGL_GUEST_MACHINE}/%{AGL_GUEST_IMAGE_IC}-%{AGL_GUEST_MACHINE}.rootfs.ext4"
 
+
+  ENABLE_ZEPHYR:
+    desc: "Build zephyr images and put into fitImage"
+    "no":
+      default: true
+    "yes":
+      overrides:
+        components:
+          dom0:
+            sources:
+              - type: git
+                url: https://github.com/soburi/meta-zephyr.git
+                rev: sodev
+            builder:
+              layers:
+                - "../meta-zephyr/meta-zephyr-core"
+                - "../../../meta-xen-domz"
+              conf:
+                - [ZEPHYR_TOOLCHAIN_VARIANT, "zephyr"]
+                - [XT_GUEST_INSTALL:append, " domz"]
+                - [DOMD_MACHINE, "%{MACHINE}"]
