@@ -722,3 +722,24 @@ parameters:
               android:
                 *ANDROID_IMAGE
 
+
+  ENABLE_ZEPHYR:
+    desc: "Build zephyr images and put into fitImage"
+    "no":
+      default: true
+    "yes":
+      overrides:
+        components:
+          dom0:
+            sources:
+              - type: git
+                url: https://github.com/soburi/meta-zephyr.git
+                rev: sodev
+            builder:
+              layers:
+                - "../meta-zephyr/meta-zephyr-core"
+                - "../../../meta-xen-domz"
+              conf:
+                - [ZEPHYR_TOOLCHAIN_VARIANT, "zephyr"]
+                - [XT_GUEST_INSTALL:append, " domz"]
+                - [DOMD_MACHINE, "%{MACHINE}"]
