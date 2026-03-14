@@ -9,6 +9,8 @@ USE_GRAPHICS_PACKAGE=yes
 ENABLE_VIRTIO=no
 ENABLE_DOMU_VIRTIO=no
 CLEAN_BUILD_TEST=no
+ENABLE_DOMU_AGL_IVI=undefined
+ENABLE_DOMU_AGL_IC=undefined
 
 Usage() {
     echo "Usage:"
@@ -38,6 +40,14 @@ do
 done
 if [[ "${USING_DOMU}" == "yes" ]] && [[ "${ENABLE_VIRTIO}" == "yes" ]]; then
     ENABLE_DOMU_VIRTIO=yes
+fi
+
+if [[ "${ENABLE_DOMU_AGL_IVI}" == "undefined" ]]; then
+    ENABLE_DOMU_AGL_IVI=${USING_DOMU}
+fi
+
+if [[ "${ENABLE_DOMU_AGL_IC}" == "undefined" ]]; then
+    ENABLE_DOMU_AGL_IC=${USING_DOMU}
 fi
 
 cd ${WORK_DIR}
@@ -87,8 +97,9 @@ moulin prod-devel-rcar4_new.yaml \
     --USE_GRAPHICS_PACKAGE ${USE_GRAPHICS_PACKAGE} \
     --ENABLE_VIRTIO ${ENABLE_VIRTIO} \
     --ADD_META_TEST yes \
-    --ENABLE_DOMU_AGL_IVI yes \
-    --ENABLE_DOMU_AGL_IC yes \
+    --ENABLE_DOMU_AGL_IVI ${ENABLE_DOMU_AGL_IVI} \
+    --ENABLE_DOMU_AGL_IC ${ENABLE_DOMU_AGL_IC} \
+
 
 if [[ "${INHERIT_RM_WORK}" == "yes" ]]; then
     echo "apply rm_work"
