@@ -55,8 +55,6 @@ common_data:
   conf: &COMMON_CONF
     - [DL_DIR, "${TOPDIR}/../common_data/downloads"]
     - [SSTATE_DIR, "${TOPDIR}/../common_data/sstate"]
-    - [TMPDIR:mc:dom0, "${TOPDIR}/tmp-dom0"]
-    - [TMPDIR:mc:domd, "${TOPDIR}/tmp-domd"]
 
     # Skip warning about missing "virtualization" distro feature
     - [SKIP_META_VIRT_SANITY_CHECK, "1"]
@@ -123,47 +121,21 @@ components:
       work_dir: "%{DOM0_BUILD_DIR}"
       conf:
         - *COMMON_CONF
+        - [DISTRO_FEATURES:append, " usrmerge systemd"]
+        - [VIRTUAL-RUNTIME_init_manager, "systemd"]
         - [BBMULTICONFIG, "dom0 domd"]
         - [MACHINE, "sparrow-hawk"]
-        - [XT_DOM_NAME:mc:dom0, "dom0"]
         - [XT_DOMD_CONFIG_NAME, "%{XT_DOMD_CONFIG_NAME}"]
         - [XT_DOMU_CONFIG_NAME:mc:dom0, "%{XT_DOMU_CONFIG_NAME}"]
         - [XT_DOMD_DTB_NAME, "%{XT_DOMD_DTB_NAME}"]
         - [XT_XEN_DTB_NAME, "%{XT_XEN_DTB_NAME}"]
+        - [XT_DEVICE_TREES, "%{XT_DOMD_DTB_NAME} %{XT_XEN_DTB_NAME}"]
         - [XT_AUTOSTART_DOMA:mc:dom0, "%{XT_AUTOSTART_DOMA}"]
         - [XT_AUTOSTART_DOMU:mc:dom0, "%{XT_AUTOSTART_DOMU}"]
         - [XT_AUTOSTART_DOMAGL_IVI:mc:dom0, "%{XT_AUTOSTART_DOMAGL_IVI}"]
         - [XT_AUTOSTART_DOMAGL_IC:mc:dom0, "%{XT_AUTOSTART_DOMAGL_IC}"]
-
-        # Disable HWDB which quite huge (around 15MB) and is not required at all
-        - [BAD_RECOMMENDATIONS:append:mc:dom0, " udev-hwdb"]
+        - [XT_GUEST_INSTALL:mc:dom0, "domd"]
         - [MACHINE_EXTRA_RRECOMMENDS:remove, "linux-fitimage"]
-
-        # Enable systemd on dom0
-        - [DISTRO_FEATURES:append:mc:dom0, " usrmerge systemd"]
-        - [VIRTUAL-RUNTIME_init_manager:mc:dom0, "systemd"]
-
-        # Do not install kernel image to rootfs to decrease initrd size
-        - ["RRECOMMENDS:${KERNEL_PACKAGE_NAME}-base:mc:dom0", ""]
-
-        - [MACHINE:mc:domd, "%{MACHINE}"]
-        - [SOC_FAMILY:mc:domd, "%{SOC_FAMILY}"]
-        - [INIT_MANAGER, "systemd"]
-        - [DISTRO_FEATURES:append:mc:domd, " usrmerge"]
-        - [DISTRO_FEATURES:remove:xen-tools:mc:domd, "systemd"]
-        - [SDKIMAGE_FEATURES:append:mc:domd, " staticdev-pkgs"]
-        - [LICENSE_FLAGS_ACCEPTED:mc:domd, "commercial"]
-        - [MACHINE_FEATURES:append:mc:domd, " cas"]
-        - [DISTRO_FEATURES:remove:mc:domd, "ptest"]
-        - [IMAGE_FSTYPES:append:mc:domd, " ext4"]
-        - [PACKAGECONFIG:remove:mc:domd, "perf"]
-        - [PACKAGECONFIG:remove:mc:domd, "tools-profile"]
-        - [RENESAS_EXTRA_IMAGE_FEATURES:remove:mc:domd, "tools-profile"]
-        - [CORE_IMAGE_EXTRA_INSTALL:remove:mc:domd, "perf"]
-        - [XT_DOM_NAME:mc:domd, "domd"]
-        - [XT_DEVICE_TREES, "%{XT_DOMD_DTB_NAME} %{XT_XEN_DTB_NAME}"]
-        - [IMAGE_INSTALL:append:mc:domd, " socat iperf3 smcroute snort"]
-        - [XT_GUEST_INSTALL, "domd"]
 
       layers:
         - "../meta-virtualization"
@@ -403,8 +375,6 @@ parameters:
                 - "../../../meta-xen-domd"
                 - "../../../meta-xen-domx"
                 - "../meta-openembedded/meta-multimedia"
-              conf:
-                - [IMAGE_INSTALL:append:mc:domd, " iperf3 htop tcpdump coreutils ethtool"]
           domd:
             builder:
               layers:
@@ -460,6 +430,16 @@ parameters:
           dom0:
             builder:
               conf:
+                - [IMAGE_INSTALL:append:mc:domd, " mesa"]
+                - [DISTRO_FEATURES_NATIVESDK:append, " wayland x11"]
+                - [DISTRO_FEATURES:append, " pam wayland"]
+                - [DISTRO_FEATURES:remove, " ptest x11 vulkan"]
+                - [BBMASK, "kernel-module-gles|user-module-gles"]
+                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/wayland-wsegl"]
+                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/wayland-kms"]
+                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/libgbm"]
+                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/weston_%.bbappend"]
+                - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/packagegroups/packagegroup-renesas-graphics.bb"]
                 - [XT_DOMD_USE_CPU_GRAPHICS, "1"]
           domd:
             builder:
@@ -485,6 +465,16 @@ parameters:
               conf:
                 # Enable Gfx Pkgs
                 - [MACHINE_FEATURES:append, " gsx"]
+                - [DISTRO_FEATURES_NATIVESDK:append, " wayland"]
+                - [DISTRO_FEATURES:append, " pam wayland"]
+                - [BB_MULTI_PROVIDER_ALLOWED:append, "virtual/libgl virtual/egl virtual/libgles1 virtual/libgles2"]
+                - [PREFERRED_PROVIDER_virtual/libgles1, ""]
+                - [PREFERRED_PROVIDER_virtual/libgles2, "user-module-gles"]
+                - [PREFERRED_PROVIDER_virtual/egl, "libegl"]
+                - [PREFERRED_PROVIDER_virtual/libgl, ""]
+                - [PREFERRED_PROVIDER_virtual/mesa, ""]
+                - [PREFERRED_PROVIDER_virtual/libgbm, "libgbm"]
+                - [PREFERRED_PROVIDER_libgbm-dev, "libgbm"]
                 - [XT_DOMD_USE_CPU_GRAPHICS, "0"]
               layers:
                 - "../../../meta-xen-domd-gfx"
