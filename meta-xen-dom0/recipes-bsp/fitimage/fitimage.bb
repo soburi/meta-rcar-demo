@@ -11,13 +11,19 @@ DEPENDS += "u-boot-mkimage-native dtc-native"
 FILESEXTRAPATHS:prepend := "${THISDIR}/../../recipes-core/core-image-thin-initramfs/files:"
 SRC_URI += " file://fit-image.its"
 
-DOM0_DEPLOY_DIR = "${TOPDIR}/tmp/deploy/images/generic-armv8-xt"
-DOMD_DEPLOY_DIR = "${TOPDIR}/../build-domd/tmp/deploy/images/${MACHINE}"
+DOM0_DEPLOY_DIR = "${TMPDIR}/deploy/images/${MACHINE}"
+DOMD_DEPLOY_DIR = "${TOPDIR}/tmp-domd/deploy/images/${MACHINE}"
 FITIMAGE_OUTPUT = "${WORKDIR}/fitImage"
 
 do_deploy[depends] += " \
     core-image-thin-initramfs:do_deploy \
     virtual/kernel:do_deploy \
+"
+do_deploy[mcdepends] += " \
+    mc:dom0:domd:linux-renesas:do_deploy \
+    mc:dom0:domd:xen:do_deploy \
+    mc:dom0:domd:xen-tools:do_deploy \
+    mc:dom0:domd:arm-trusted-firmware:do_deploy \
 "
 
 do_deploy() {
