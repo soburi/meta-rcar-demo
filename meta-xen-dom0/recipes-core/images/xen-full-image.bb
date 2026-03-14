@@ -16,9 +16,9 @@ WKS_FILE = "xen-full-image.wks.in"
 WKS_FILE_DEPENDS = "e2fsprogs-native dosfstools-native mtools-native gptfdisk-native"
 WICVARS:append = " XEN_FULL_DOMD_ROOTFS"
 
-XEN_FULL_DOM0_FITIMAGE = "${TOPDIR}/tmp/deploy/images/generic-armv8-xt/fitImage"
-XEN_FULL_DOM0_FLASHBIN = "${TOPDIR}/../build-domd/tmp/deploy/images/${MACHINE}/flash.bin"
-XEN_FULL_DOMD_ROOTFS = "${TOPDIR}/../build-domd/tmp/deploy/images/${MACHINE}/core-image-weston-${MACHINE}.rootfs.ext4"
+XEN_FULL_DOM0_FITIMAGE = "${TOPDIR}/tmp-dom0/deploy/images/${MACHINE}/fitImage"
+XEN_FULL_DOM0_FLASHBIN = "${TOPDIR}/tmp-domd/deploy/images/${MACHINE}/flash.bin"
+XEN_FULL_DOMD_ROOTFS = "${TOPDIR}/tmp-domd/deploy/images/${MACHINE}/core-image-weston-${MACHINE}.rootfs.ext4"
 
 IMAGE_BOOT_FILES = " \
     ${XEN_FULL_DOM0_FITIMAGE};fitImage \
@@ -27,6 +27,10 @@ IMAGE_BOOT_FILES = " \
 "
 
 do_image_wic[depends] += "fitimage:do_deploy"
+do_image_wic[mcdepends] += " \
+    mc:dom0:domd:u-boot:do_deploy \
+    mc:dom0:domd:core-image-weston:do_deploy_rootfs_ext4_link \
+"
 do_image_wic[prefuncs] += "xen_full_check_inputs"
 do_populate_lic_deploy[noexec] = "1"
 
