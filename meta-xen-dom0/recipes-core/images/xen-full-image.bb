@@ -29,10 +29,26 @@ IMAGE_BOOT_FILES = " \
 do_image_wic[depends] += "fitimage:do_deploy"
 do_image_wic[mcdepends] += " \
     mc:dom0:domd:u-boot:do_deploy \
-    mc:dom0:domd:core-image-weston:do_deploy_rootfs_ext4_link \
+    mc:dom0:domd:core-image-weston:do_image_complete \
 "
-do_image_wic[prefuncs] += "xen_full_check_inputs"
+do_image_wic[prefuncs] += "xen_full_resolve_domd_rootfs xen_full_check_inputs"
 do_populate_lic_deploy[noexec] = "1"
+
+xen_full_resolve_domd_rootfs() {
+    if [ -e "${XEN_FULL_DOMD_ROOTFS}" ]; then
+        return
+    fi
+
+    local src_ext4
+    local src_pattern="${TOPDIR}/tmp-domd/deploy/images/${MACHINE}/core-image-weston-${MACHINE}.rootfs-"*.ext4
+
+    src_ext4=$(ls -1t ${src_pattern} 2>/dev/null | head -n1 || true)
+    if [ -z "${src_ext4}" ]; then
+        bbfatal "Missing DomD rootfs ext4 source file. Looked for ${src_pattern}"
+    fi
+
+    ln -sf "$(basename "${src_ext4}")" "${XEN_FULL_DOMD_ROOTFS}"
+}
 
 xen_full_check_inputs() {
     [ -e "${XEN_FULL_DOM0_FITIMAGE}" ] || bbfatal "Missing fitImage file: ${XEN_FULL_DOM0_FITIMAGE}"
