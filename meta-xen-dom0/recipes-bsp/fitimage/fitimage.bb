@@ -14,6 +14,7 @@ SRC_URI += " file://fit-image.its"
 DOM0_DEPLOY_DIR = "${TMPDIR}/deploy/images/${MACHINE}"
 DOMD_DEPLOY_DIR = "${TOPDIR}/tmp-domd/deploy/images/${MACHINE}"
 FITIMAGE_OUTPUT = "${WORKDIR}/fitImage"
+DOM0_INITRAMFS = "${DOM0_DEPLOY_DIR}/core-image-thin-initramfs-${MACHINE}.rootfs.cpio.gz"
 
 do_deploy[depends] += " \
     core-image-thin-initramfs:do_deploy \
@@ -29,7 +30,7 @@ do_deploy[mcdepends] += " \
 do_deploy() {
     cd ${WORKDIR}
     cp -f ${DOM0_DEPLOY_DIR}/Image ./Image
-    cp -f ${DOM0_DEPLOY_DIR}/uInitramfs ./uInitramfs
+    cp -Lf ${DOM0_INITRAMFS} ./dom0-initramfs.cpio.gz
     cp -Lf ${DOMD_DEPLOY_DIR}/xen-${MACHINE} ./xen
     cp -Lf ${DOMD_DEPLOY_DIR}/xenpolicy-${MACHINE} ./xenpolicy
     cp -Lf ${DOMD_DEPLOY_DIR}/${XT_XEN_DTB_NAME} ./xen.dtb
