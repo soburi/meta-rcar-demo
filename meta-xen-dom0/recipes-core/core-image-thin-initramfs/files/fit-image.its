@@ -67,11 +67,11 @@
 		};
 		ramdisk-1 {
 			description = "Dom0 initramfs";
-			data = /incbin/("./dom0-initramfs.cpio.gz");
+			data = /incbin/("./uInitramfs");
 			type = "ramdisk";
 			arch = "arm64";
 			os = "linux";
-			compression = "gzip";
+			compression = "none";
 			hash-1 {
 				algo = "crc32";
 			};

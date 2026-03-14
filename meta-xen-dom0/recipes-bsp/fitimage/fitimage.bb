@@ -30,7 +30,7 @@ do_deploy[mcdepends] += " \
 do_deploy() {
     cd ${WORKDIR}
     cp -f ${DOM0_DEPLOY_DIR}/Image ./Image
-    cp -Lf ${DOM0_INITRAMFS} ./dom0-initramfs.cpio.gz
+    cp -Lf ${DOM0_INITRAMFS} ./uInitramfs
     cp -Lf ${DOMD_DEPLOY_DIR}/xen-${MACHINE} ./xen
     cp -Lf ${DOMD_DEPLOY_DIR}/xenpolicy-${MACHINE} ./xenpolicy
     cp -Lf ${DOMD_DEPLOY_DIR}/${XT_XEN_DTB_NAME} ./xen.dtb
