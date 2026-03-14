@@ -149,7 +149,7 @@ components:
       build_target: mc:dom0:xen-full-image
       target_images:
         - "tmp-dom0/deploy/images/%{MACHINE}/fitImage"
-        - "tmp-domd/deploy/images/%{MACHINE}/flash.bin"
+        - "tmp-domd/deploy/images/%{MACHINE}/ipl-burning/flash.bin"
         - "tmp-domd/deploy/images/%{MACHINE}/core-image-weston-%{MACHINE}.rootfs.ext4"
   domd:
     build-dir: "%{YOCTOS_WORK_DIR}"
@@ -416,7 +416,7 @@ parameters:
             partitions:
               boot:
                 items:
-                  "flash.bin": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/flash.bin"
+                  "flash.bin": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/ipl-burning/flash.bin"
                   "fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{MACHINE}/fitImage"
                   "/boot/fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{MACHINE}/fitImage"
 
