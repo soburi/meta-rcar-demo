@@ -93,9 +93,13 @@ components:
         - [XT_DOMD_CONFIG_NAME, "%{XT_DOMD_CONFIG_NAME}"]
         - [XT_DOMD_DTB_NAME, "%{XT_DOMD_DTB_NAME}"]
         - [XT_DEVICE_TREES, "%{XT_DOMD_DTB_NAME}"]
+
         - [MACHINE_EXTRA_RRECOMMENDS:remove, "linux-fitimage"]
+
         - [DISTRO_FEATURES:append, " usrmerge systemd"]
         - [VIRTUAL-RUNTIME_init_manager, "systemd"]
+
+
 
       layers:
         - "../meta-virtualization"
