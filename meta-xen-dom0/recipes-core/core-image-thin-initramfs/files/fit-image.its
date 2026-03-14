@@ -76,6 +76,9 @@
 				algo = "crc32";
 			};
 		};
+
+		/include/ "fit-image-extra.its"
+
 	};
 
 	configurations {
