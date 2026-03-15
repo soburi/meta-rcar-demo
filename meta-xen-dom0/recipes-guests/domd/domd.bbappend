@@ -1,12 +1,12 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-RDEPENDS:${PN}:append:sparrow-hawk = " dtc"
-DOMD_DEPLOY_DIR = "${TOPDIR}/tmp-domd/deploy/images/${MACHINE}"
-DOMD_INITRAMFS_DEPLOY_NAME = "initramfs-image-${MACHINE}.rootfs.cpio.gz"
+RDEPENDS:${PN}:append = " dtc"
+DOMD_DEPLOY_DIR = "${TOPDIR}/tmp-domd/deploy/images/${DOMD_MACHINE}"
+DOMD_INITRAMFS_DEPLOY_NAME = "initramfs-domd.cpio.gz"
 
 do_install[mcdepends] += " \
-    mc:dom0:domd:virtual/kernel:do_deploy \
-    mc:dom0:domd:initramfs-image:do_image_complete \
+    mc::domd:virtual/kernel:do_deploy \
+    mc::domd:initramfs-image:do_image_complete \
 "
 
 SRC_URI:append = "\

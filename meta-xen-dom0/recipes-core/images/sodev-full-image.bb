@@ -17,8 +17,8 @@ WKS_FILE_DEPENDS = "e2fsprogs-native dosfstools-native mtools-native gptfdisk-na
 WICVARS:append = " SODEV_FULL_DOMD_ROOTFS"
 
 SODEV_FULL_DOM0_FITIMAGE = "${TOPDIR}/tmp-dom0/deploy/images/${MACHINE}/fitImage"
-SODEV_FULL_DOM0_FLASHBIN = "${TOPDIR}/tmp-domd/deploy/images/${MACHINE}/ipl-burning/flash.bin"
-SODEV_FULL_DOMD_ROOTFS = "${TOPDIR}/tmp-domd/deploy/images/${MACHINE}/core-image-weston-${MACHINE}.rootfs.ext4"
+SODEV_FULL_DOM0_FLASHBIN = "${TOPDIR}/tmp-domd/deploy/images/${DOMD_MACHINE}/ipl-burning/flash.bin"
+SODEV_FULL_DOMD_ROOTFS = "${TOPDIR}/tmp-domd/deploy/images/${DOMD_MACHINE}/core-image-weston-${DOMD_MACHINE}.rootfs.ext4"
 
 IMAGE_BOOT_FILES = " \
     ${SODEV_FULL_DOM0_FITIMAGE};fitImage \
@@ -28,8 +28,8 @@ IMAGE_BOOT_FILES = " \
 
 do_image_wic[depends] += "core-image-thin-initramfs:do_image_complete"
 do_image_wic[mcdepends] += " \
-    mc:dom0:domd:ipl-burning:do_deploy \
-    mc:dom0:domd:core-image-weston:do_image_complete \
+    mc::domd:ipl-burning:do_deploy \
+    mc::domd:core-image-weston:do_image_complete \
 "
 do_image_wic[prefuncs] += "sodev_full_resolve_domd_rootfs sodev_full_check_inputs"
 do_populate_lic_deploy[noexec] = "1"
@@ -40,7 +40,7 @@ sodev_full_resolve_domd_rootfs() {
     fi
 
     local src_ext4
-    local src_pattern="${TOPDIR}/tmp-domd/deploy/images/${MACHINE}/core-image-weston-${MACHINE}.rootfs-"*.ext4
+    local src_pattern="${TOPDIR}/tmp-domd/deploy/images/${DOMD_MACHINE}/core-image-weston-${DOMD_MACHINE}.rootfs-"*.ext4
 
     src_ext4=$(ls -1t ${src_pattern} 2>/dev/null | head -n1 || true)
     if [ -z "${src_ext4}" ]; then

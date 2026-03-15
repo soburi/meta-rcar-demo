@@ -147,7 +147,6 @@ moulin prod-devel-rcar4_new.yaml \
     --ENABLE_DOMU_AGL_IC ${ENABLE_DOMU_AGL_IC} \
     --ENABLE_ZEPHYR ${ENABLE_ZEPHYR} \
 
-
 if [[ "${INHERIT_RM_WORK}" == "yes" ]]; then
     echo "apply rm_work"
     ../scripts/inherit_rm_work.sh
@@ -160,4 +159,3 @@ ninja full.img
 # else
 #     ninja full.img.gz
 # fi
-

@@ -5,11 +5,13 @@ variables:
   YOCTOS_WORK_DIR: "yocto"
   DOM0_BUILD_DIR: "build-dom0"
   DOMU_BUILD_DIR: "build-domu"
-  XT_DOMD_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-domd.dtb"
+  DOM0_MACHINE: "generic-armv8-xt"
+  DOMD_MACHINE: "%{MACHINE}"
+  XT_DOMD_DTB_NAME: "%{SOC_FAMILY}-%{DOMD_MACHINE}-domd.dtb"
   XT_DOMU_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-domu.dtb"
-  XT_XEN_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-xen.dtb"
+  XT_XEN_DTB_NAME: "%{SOC_FAMILY}-%{DOMD_MACHINE}-xen.dtb"
   XT_GENERIC_DOMU_TAG: ""
-  XT_DOMD_CONFIG_NAME: "domd-%{MACHINE}.cfg"
+  XT_DOMD_CONFIG_NAME: "domd-%{DOMD_MACHINE}.cfg"
   XT_DOMU_CONFIG_NAME: "domu-%{MACHINE}.cfg"
   # Android related
   ANDROID_KERNEL_DIR: "android_kernel"
@@ -121,21 +123,15 @@ components:
       conf:
         - [BBMULTICONFIG, "dom0 domd"]
         - *COMMON_CONF
-        - [MACHINE, "sparrow-hawk"]
+        - [MACHINE, "%{DOM0_MACHINE}"]
+        - [DOM0_MACHINE, "%{DOM0_MACHINE}"]
+        - [DOMD_MACHINE, "%{DOMD_MACHINE}"]
         - [XT_DOMD_CONFIG_NAME, "%{XT_DOMD_CONFIG_NAME}"]
         - [XT_DOMD_DTB_NAME, "%{XT_DOMD_DTB_NAME}"]
         - [XT_DEVICE_TREES, "%{XT_DOMD_DTB_NAME}"]
         - [MACHINE_EXTRA_RRECOMMENDS:remove, "linux-fitimage"]
         - [DISTRO_FEATURES:append, " usrmerge systemd"]
         - [VIRTUAL-RUNTIME_init_manager, "systemd"]
-        - [BB_MULTI_PROVIDER_ALLOWED:append, " virtual/libgl virtual/egl virtual/libgles1 virtual/libgles2"]
-        - [PREFERRED_PROVIDER_virtual/libgles1, ""]
-        - [PREFERRED_PROVIDER_virtual/libgles2, "gles-user-module"]
-        - [PREFERRED_PROVIDER_virtual/egl, "libegl"]
-        - [PREFERRED_PROVIDER_virtual/libgl, ""]
-        - [PREFERRED_PROVIDER_virtual/mesa, ""]
-        - [PREFERRED_PROVIDER_virtual/libgbm, "libgbm"]
-        - [PREFERRED_PROVIDER_libgbm-dev, "libgbm"]
 
       layers:
         - "../meta-virtualization"
@@ -151,9 +147,9 @@ components:
         - "../meta-xt-common/meta-xt-security"
       build_target: mc:dom0:sodev-full-image
       target_images:
-        - "tmp-dom0/deploy/images/%{MACHINE}/fitImage"
-        - "tmp-domd/deploy/images/%{MACHINE}/ipl-burning/flash.bin"
-        - "tmp-domd/deploy/images/%{MACHINE}/core-image-weston-%{MACHINE}.rootfs.ext4"
+        - "tmp-dom0/deploy/images/%{DOM0_MACHINE}/fitImage"
+        - "tmp-domd/deploy/images/%{DOMD_MACHINE}/ipl-burning/flash.bin"
+        - "tmp-domd/deploy/images/%{DOMD_MACHINE}/core-image-weston-%{DOMD_MACHINE}.rootfs.ext4"
   domu:
     build-dir: "%{YOCTOS_WORK_DIR}"
     sources:
@@ -248,9 +244,9 @@ components:
       type: archive
       name: "%{MACHINE}-boot-artifacts.tar.bz"
       items:
-        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{MACHINE}/fitImage"
-        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/ipl-burning/flash.bin"
-        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/core-image-weston-%{MACHINE}.rootfs.ext4"
+        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{DOM0_MACHINE}/fitImage"
+        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{DOMD_MACHINE}/ipl-burning/flash.bin"
+        - "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{DOMD_MACHINE}/core-image-weston-%{DOMD_MACHINE}.rootfs.ext4"
 
 images:
   full:
@@ -264,7 +260,7 @@ images:
       domd_rootfs:
         gpt_type: B921B045-1DF0-41C3-AF44-4C6F280D3FAE # Linux aarch64 root
         type: raw_image
-        image_path: "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/core-image-weston-%{MACHINE}.rootfs.ext4"
+        image_path: "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{DOMD_MACHINE}/core-image-weston-%{DOMD_MACHINE}.rootfs.ext4"
 
 parameters:
   ENABLE_DOMU:
@@ -344,7 +340,7 @@ parameters:
                 - [IMAGE_INSTALL:remove, "libcamera libcamera-pycamera"]
                 - [MACHINE_EXTRA_RRECOMMENDS:remove, "linux-fitimage"]
                 # Mask graphic Pkgs
-                - [BBMASK, "kernel-module-gles|user-module-gles"]
+                - [BBMASK, "kernel-module-gles|gles-user-module"]
                 - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/wayland-wsegl"]
                 - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/wayland-kms"]
                 - [BBMASK:append, "|meta-sparrow-hawk/recipes-graphics/wayland/libgbm"]
@@ -360,9 +356,9 @@ parameters:
             partitions:
               boot:
                 items:
-                  "flash.bin": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/ipl-burning/flash.bin"
-                  "fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{MACHINE}/fitImage"
-                  "/boot/fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{MACHINE}/fitImage"
+                  "flash.bin": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{DOMD_MACHINE}/ipl-burning/flash.bin"
+                  "fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{DOM0_MACHINE}/fitImage"
+                  "/boot/fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{DOM0_MACHINE}/fitImage"
 
   USE_GRAPHICS_PACKAGE:
     desc: "Enable GPU on DomD"
@@ -382,7 +378,6 @@ parameters:
             builder:
               conf:
                 # Enable Gfx Pkgs
-                - [MACHINE_FEATURES:append, " gsx"]
                 - [XT_DOMD_USE_CPU_GRAPHICS, "0"]
                 - [MACHINE_FEATURES:append:mc:domd, " gsx"]
               layers:
@@ -541,7 +536,7 @@ parameters:
                 - "../%{DOMA_DIR}/out/target/product/%{ANDROID_DEVICE}/boot.img"
               external_src:
                 # Android uses DTB generated by DomD
-                doma: "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{MACHINE}/"
+                doma: "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{DOMD_MACHINE}/"
         images:
           android_only: &ANDROID_IMAGE
             desc: "Android sub-image (this image is passed to Android VM as a separate block device)"
@@ -697,4 +692,3 @@ parameters:
               conf:
                 - [ZEPHYR_TOOLCHAIN_VARIANT, "zephyr"]
                 - [XT_GUEST_INSTALL:append, " domz"]
-                - [DOMD_MACHINE, "%{MACHINE}"]

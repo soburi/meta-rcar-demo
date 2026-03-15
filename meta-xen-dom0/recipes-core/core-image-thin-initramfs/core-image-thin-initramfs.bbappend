@@ -4,13 +4,13 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 inherit deploy
 inherit externalsrc
 EXTERNALSRC_SYMLINKS = ""
-DOMD_DEPLOY_DIR = "${TOPDIR}/tmp-domd/deploy/images/${MACHINE}"
+DOMD_DEPLOY_DIR = "${TOPDIR}/tmp-domd/deploy/images/${DOMD_MACHINE}"
 
 do_image_complete[mcdepends] += " \
-    mc:dom0:domd:virtual/kernel:do_deploy \
-    mc:dom0:domd:xen:do_deploy \
-    mc:dom0:domd:xen-tools:do_deploy \
-    mc:dom0:domd:arm-trusted-firmware:do_deploy \
+    mc::domd:virtual/kernel:do_deploy \
+    mc::domd:xen:do_deploy \
+    mc::domd:xen-tools:do_deploy \
+    mc::domd:arm-trusted-firmware:do_deploy \
 "
 
 generate_uboot_image() {
@@ -33,7 +33,7 @@ do_copy_files () {
 addtask do_copy_files before do_image_complete
 
 append_bin_image() {
-    local fit_dir="${@d.getVar('EXTERNALSRC') or d.expand('${TOPDIR}/tmp/deploy/images/${DOMD_MACHINE}')}"
+    local fit_dir="${@d.getVar('EXTERNALSRC') or d.expand('${TOPDIR}/tmp-dom0/deploy/images/${MACHINE}')}"
     local bin_basename=${1%.bin}
 
     if [ -n "${fit_dir}" ] && [ -f "${fit_dir}/${bin_basename}.bin" ]; then
@@ -58,10 +58,10 @@ generate_fit_image() {
     cd ${WORKDIR}
     cp -f ${DEPLOY_DIR_IMAGE}/Image ./Image
     cp -f ${IMGDEPLOYDIR}/${IMAGE_NAME}.cpio.gz ./uInitramfs
-    cp -f ${DOMD_DEPLOY_DIR}/xen-${MACHINE}.efi ./xen
-    cp -f ${DOMD_DEPLOY_DIR}/xenpolicy-${MACHINE} ./xenpolicy
+    cp -f ${DOMD_DEPLOY_DIR}/xen-${DOMD_MACHINE}.efi ./xen
+    cp -f ${DOMD_DEPLOY_DIR}/xenpolicy-${DOMD_MACHINE} ./xenpolicy
     cp -f ${DOMD_DEPLOY_DIR}/${XT_XEN_DTB_NAME} ./xen.dtb
-    cp -f ${DOMD_DEPLOY_DIR}/bl31-${MACHINE}.bin ./bl31.bin
+    cp -f ${DOMD_DEPLOY_DIR}/bl31-${DOMD_MACHINE}.bin ./bl31.bin
 
     echo "" > ./fit-image-extra.its
 
