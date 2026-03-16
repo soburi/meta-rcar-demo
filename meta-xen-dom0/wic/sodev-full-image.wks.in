@@ -4,3 +4,4 @@ bootloader --ptable gpt
 
 part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=ext4 --label boot --fixed-size 256M --part-type 21686148-6449-6E6F-744E-656564454649
 part / --source rawcopy --sourceparams="file=${SODEV_FULL_DOMD_ROOTFS}" --ondisk mmcblk0 --part-type B921B045-1DF0-41C3-AF44-4C6F280D3FAE
+${@'part /domu-rootfs --source rawcopy --sourceparams="file=%s" --ondisk mmcblk0 --part-type 0FC63DAF-8483-4772-8E79-3D69D8477DE4' % d.getVar('SODEV_FULL_DOMU_ROOTFS') if d.getVar('SODEV_FULL_INCLUDE_DOMU') == '1' else ''}

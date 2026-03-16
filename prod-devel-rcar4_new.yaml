@@ -126,6 +126,7 @@ components:
         - [MACHINE, "%{DOM0_MACHINE}"]
         - [DOM0_MACHINE, "%{DOM0_MACHINE}"]
         - [DOMD_MACHINE, "%{DOMD_MACHINE}"]
+        - [SODEV_FULL_INCLUDE_DOMU, "0"]
         - [XT_DOMD_CONFIG_NAME, "%{XT_DOMD_CONFIG_NAME}"]
         - [XT_DOMD_DTB_NAME, "%{XT_DOMD_DTB_NAME}"]
         - [XT_DEVICE_TREES, "%{XT_DOMD_DTB_NAME}"]
@@ -145,8 +146,9 @@ components:
         - "../meta-xt-common/meta-xt-domx"
         - "../meta-xt-common/meta-xt-driver-domain"
         - "../meta-xt-common/meta-xt-security"
-      build_target: mc:dom0:core-image-thin-initramfs
+      build_target: mc:dom0:sodev-full-image
       target_images:
+        - "tmp-dom0/deploy/images/%{DOM0_MACHINE}/sodev-full-image-%{DOM0_MACHINE}.wic"
         - "tmp-dom0/deploy/images/%{DOM0_MACHINE}/fitImage"
         - "tmp-domd/deploy/images/%{DOMD_MACHINE}/ipl-burning/flash.bin"
         - "tmp-domd/deploy/images/%{DOMD_MACHINE}/core-image-weston-%{DOMD_MACHINE}.rootfs.ext4"
@@ -278,6 +280,9 @@ parameters:
                 - "%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image"
               external_src:
                 domu: "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/"
+              conf:
+                - [SODEV_FULL_INCLUDE_DOMU, "1"]
+                - [SODEV_FULL_DOMU_ROOTFS, "${TOPDIR}/../%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/core-image-minimal-%{DOMU_MACHINE}.rootfs.ext4"]
         images:
           full:
             partitions:
@@ -433,6 +438,8 @@ parameters:
             builder:
               conf:
                 - [XT_DOMU_DTB_NAME, "%{XT_DOMU_DTB_NAME}"]
+                - [SODEV_FULL_INCLUDE_DOMU, "1"]
+                - [SODEV_FULL_DOMU_ROOTFS, "${TOPDIR}/../%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/core-image-minimal-%{DOMU_MACHINE}.rootfs.ext4"]
           domu:
             builder:
               build_target: core-image-minimal
@@ -443,6 +450,13 @@ parameters:
         variables:
           DOMU_MACHINE: "virtio-armv8-xt"
         components:
+          dom0:
+            builder:
+              additional_deps:
+                - "%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/core-image-weston-%{DOMU_MACHINE}.rootfs.ext4"
+              conf:
+                - [SODEV_FULL_INCLUDE_DOMU, "1"]
+                - [SODEV_FULL_DOMU_ROOTFS, "${TOPDIR}/../%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/core-image-weston-%{DOMU_MACHINE}.rootfs.ext4"]
           domu:
             builder:
               layers:

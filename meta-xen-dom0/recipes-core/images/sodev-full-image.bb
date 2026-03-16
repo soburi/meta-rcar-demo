@@ -14,11 +14,13 @@ IMAGE_LINGUAS = ""
 IMAGE_FSTYPES = "wic"
 WKS_FILE = "sodev-full-image.wks.in"
 WKS_FILE_DEPENDS = "e2fsprogs-native dosfstools-native mtools-native gptfdisk-native"
-WICVARS:append = " SODEV_FULL_DOMD_ROOTFS"
+WICVARS:append = " SODEV_FULL_DOMD_ROOTFS SODEV_FULL_DOMU_ROOTFS SODEV_FULL_INCLUDE_DOMU"
 
 SODEV_FULL_DOM0_FITIMAGE = "${TOPDIR}/tmp-dom0/deploy/images/${MACHINE}/fitImage"
 SODEV_FULL_DOM0_FLASHBIN = "${TOPDIR}/tmp-domd/deploy/images/${DOMD_MACHINE}/ipl-burning/flash.bin"
 SODEV_FULL_DOMD_ROOTFS = "${TOPDIR}/tmp-domd/deploy/images/${DOMD_MACHINE}/core-image-weston-${DOMD_MACHINE}.rootfs.ext4"
+SODEV_FULL_DOMU_ROOTFS ?= ""
+SODEV_FULL_INCLUDE_DOMU ?= "0"
 
 IMAGE_BOOT_FILES = " \
     ${SODEV_FULL_DOM0_FITIMAGE};fitImage \
@@ -54,4 +56,8 @@ sodev_full_check_inputs() {
     [ -e "${SODEV_FULL_DOM0_FITIMAGE}" ] || bbfatal "Missing fitImage file: ${SODEV_FULL_DOM0_FITIMAGE}"
     [ -e "${SODEV_FULL_DOM0_FLASHBIN}" ] || bbfatal "Missing flash.bin file: ${SODEV_FULL_DOM0_FLASHBIN}"
     [ -e "${SODEV_FULL_DOMD_ROOTFS}" ] || bbfatal "Missing DomD rootfs ext4 file: ${SODEV_FULL_DOMD_ROOTFS}"
+    if [ "${SODEV_FULL_INCLUDE_DOMU}" = "1" ]; then
+        [ -n "${SODEV_FULL_DOMU_ROOTFS}" ] || bbfatal "SODEV_FULL_DOMU_ROOTFS is empty while SODEV_FULL_INCLUDE_DOMU=1"
+        [ -e "${SODEV_FULL_DOMU_ROOTFS}" ] || bbfatal "Missing DomU rootfs ext4 file: ${SODEV_FULL_DOMU_ROOTFS}"
+    fi
 }
