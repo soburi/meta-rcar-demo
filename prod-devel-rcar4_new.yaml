@@ -145,7 +145,7 @@ components:
         - "../meta-xt-common/meta-xt-domx"
         - "../meta-xt-common/meta-xt-driver-domain"
         - "../meta-xt-common/meta-xt-security"
-      build_target: mc:dom0:sodev-full-image
+      build_target: mc:dom0:core-image-thin-initramfs
       target_images:
         - "tmp-dom0/deploy/images/%{DOM0_MACHINE}/fitImage"
         - "tmp-domd/deploy/images/%{DOMD_MACHINE}/ipl-burning/flash.bin"

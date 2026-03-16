@@ -11,6 +11,8 @@ do_image_complete[mcdepends] += " \
     mc::domd:xen:do_deploy \
     mc::domd:xen-tools:do_deploy \
     mc::domd:arm-trusted-firmware:do_deploy \
+    mc::domd:ipl-burning:do_deploy \
+    mc::domd:core-image-weston:do_image_complete \
 "
 
 generate_uboot_image() {
