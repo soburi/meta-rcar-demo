@@ -35,7 +35,6 @@ variables:
   XT_AUTOSTART_DOMU: "disable"
   XT_AUTOSTART_DOMAGL_IVI: "enable"
   XT_AUTOSTART_DOMAGL_IC: "enable"
-  SODEV_FULL_DOMU_ROOTFS_CONF: ""
 
 common_data:
   # Sources used by all yocto-based domains
@@ -279,8 +278,6 @@ parameters:
                 - "%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image"
               external_src:
                 domu: "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/"
-              conf:
-                - [SODEV_FULL_DOMU_ROOTFS, "%{SODEV_FULL_DOMU_ROOTFS_CONF}"]
         images:
           full:
             partitions:
@@ -392,12 +389,12 @@ parameters:
       overrides:
         variables:
           DOMU_MACHINE: "sparrow-hawk"
-          SODEV_FULL_DOMU_ROOTFS_CONF: "${TOPDIR}/../%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/core-image-minimal-%{DOMU_MACHINE}.rootfs.ext4"
         components:
           dom0:
             builder:
               conf:
                 - [XT_DOMU_DTB_NAME, "%{XT_DOMU_DTB_NAME}"]
+                - [SODEV_FULL_DOMU_ROOTFS, "${EXTERNALSRC:pn-domu}/core-image-minimal-%{DOMU_MACHINE}.rootfs.ext4"]
     "yes":
       overrides:
         variables:
@@ -444,8 +441,11 @@ parameters:
       overrides:
         variables:
           DOMU_MACHINE: "virtio-armv8-xt"
-          SODEV_FULL_DOMU_ROOTFS_CONF: "${TOPDIR}/../%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/core-image-weston-%{DOMU_MACHINE}.rootfs.ext4"
         components:
+          dom0:
+            builder:
+              conf:
+                - [SODEV_FULL_DOMU_ROOTFS, "${EXTERNALSRC:pn-domu}/core-image-weston-%{DOMU_MACHINE}.rootfs.ext4"]
           domu:
             builder:
               layers:
