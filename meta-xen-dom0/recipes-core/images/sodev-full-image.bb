@@ -25,7 +25,6 @@ SODEV_FULL_DOMU_AGL_IC_ROOTFS ?= ""
 SODEV_FULL_ANDROID_IMAGE ?= ""
 SODEV_FULL_FREE_SPACE = "16367K"
 SODEV_FULL_OPTIONAL_PARTS = ""
-DOMD_MCDEP_PREFIX = "mc:dom0:domd"
 
 IMAGE_BOOT_FILES = " \
     ${SODEV_FULL_DOM0_FITIMAGE};fitImage \
@@ -35,15 +34,15 @@ IMAGE_BOOT_FILES = " \
 
 do_image_wic[depends] += "core-image-thin-initramfs:do_image_complete"
 do_image_wic[mcdepends] += " \
-    ${DOMD_MCDEP_PREFIX}:ipl-burning:do_deploy \
-    ${DOMD_MCDEP_PREFIX}:core-image-weston:do_image_complete \
+    mc:dom0:domd:ipl-burning:do_deploy \
+    mc:dom0:domd:core-image-weston:do_image_complete \
 "
-do_image_wic[prefuncs] += "sodev_full_resolve_domd_rootfs sodev_full_check_inputs"
+do_image_wic[prefuncs] += "sodev_full_check_inputs"
 do_populate_lic_deploy[noexec] = "1"
 
 do_prepare_domd_disk_inputs[mcdepends] += " \
-    ${DOMD_MCDEP_PREFIX}:ipl-burning:do_deploy \
-    ${DOMD_MCDEP_PREFIX}:core-image-weston:do_image_complete \
+    mc:dom0:domd:ipl-burning:do_deploy \
+    mc:dom0:domd:core-image-weston:do_image_complete \
 "
 
 python __anonymous() {
@@ -79,22 +78,6 @@ do_prepare_domd_disk_inputs() {
     :
 }
 addtask do_prepare_domd_disk_inputs before do_image_wic after do_rootfs
-
-sodev_full_resolve_domd_rootfs() {
-    if [ -e "${SODEV_FULL_DOMD_ROOTFS}" ]; then
-        return
-    fi
-
-    local src_ext4
-    local src_pattern="${TOPDIR}/tmp-domd/deploy/images/${DOMD_MACHINE}/core-image-weston-${DOMD_MACHINE}.rootfs-"*.ext4
-
-    src_ext4=$(ls -1t ${src_pattern} 2>/dev/null | head -n1 || true)
-    if [ -z "${src_ext4}" ]; then
-        bbfatal "Missing DomD rootfs ext4 source file. Looked for ${src_pattern}"
-    fi
-
-    ln -sf "$(basename "${src_ext4}")" "${SODEV_FULL_DOMD_ROOTFS}"
-}
 
 sodev_full_check_inputs() {
     [ -e "${SODEV_FULL_DOM0_FITIMAGE}" ] || bbfatal "Missing fitImage file: ${SODEV_FULL_DOM0_FITIMAGE}"

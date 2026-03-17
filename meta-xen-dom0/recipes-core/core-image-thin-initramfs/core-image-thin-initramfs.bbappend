@@ -2,14 +2,15 @@ DEPENDS += "u-boot-mkimage-native dtc-native"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 inherit deploy
+inherit externalsrc
+EXTERNALSRC_SYMLINKS = ""
 DOMD_DEPLOY_DIR = "${TOPDIR}/tmp-domd/deploy/images/${DOMD_MACHINE}"
-DOMD_MCDEP_PREFIX = "mc:dom0:domd"
 
 do_image_complete[mcdepends] += " \
-    ${DOMD_MCDEP_PREFIX}:virtual/kernel:do_deploy \
-    ${DOMD_MCDEP_PREFIX}:xen:do_deploy \
-    ${DOMD_MCDEP_PREFIX}:xen-tools:do_deploy \
-    ${DOMD_MCDEP_PREFIX}:arm-trusted-firmware:do_deploy \
+    mc:dom0:domd:virtual/kernel:do_deploy \
+    mc:dom0:domd:xen:do_deploy \
+    mc:dom0:domd:xen-tools:do_deploy \
+    mc:dom0:domd:arm-trusted-firmware:do_deploy \
 "
 
 generate_uboot_image() {
