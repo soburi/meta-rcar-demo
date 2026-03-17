@@ -35,6 +35,7 @@ variables:
   XT_AUTOSTART_DOMU: "disable"
   XT_AUTOSTART_DOMAGL_IVI: "enable"
   XT_AUTOSTART_DOMAGL_IC: "enable"
+  SODEV_FULL_DOMU_ROOTFS_CONF: ""
 
 common_data:
   # Sources used by all yocto-based domains
@@ -278,13 +279,14 @@ parameters:
                 - "%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image"
               external_src:
                 domu: "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/"
+              conf:
+                - [SODEV_FULL_DOMU_ROOTFS, "%{SODEV_FULL_DOMU_ROOTFS_CONF}"]
         images:
           full:
             partitions:
               domu-rootfs:
                 type: raw_image
                 gpt_type: 0FC63DAF-8483-4772-8E79-3D69D8477DE4 # Linux filesystem data
-                #image_path: "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/core-image-weston-%{MACHINE}.rootfs.ext4"
                 image_path: "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{MACHINE}/core-image-minimal-%{MACHINE}.rootfs.ext4"
 # parameters:
   MACHINE:
@@ -359,7 +361,6 @@ parameters:
                   "flash.bin": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{DOMD_MACHINE}/ipl-burning/flash.bin"
                   "fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{DOM0_MACHINE}/fitImage"
                   "/boot/fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{DOM0_MACHINE}/fitImage"
-
   USE_GRAPHICS_PACKAGE:
     desc: "Enable GPU on DomD"
     "no":
@@ -391,6 +392,7 @@ parameters:
       overrides:
         variables:
           DOMU_MACHINE: "sparrow-hawk"
+          SODEV_FULL_DOMU_ROOTFS_CONF: "${TOPDIR}/../%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/core-image-minimal-%{DOMU_MACHINE}.rootfs.ext4"
         components:
           dom0:
             builder:
@@ -442,6 +444,7 @@ parameters:
       overrides:
         variables:
           DOMU_MACHINE: "virtio-armv8-xt"
+          SODEV_FULL_DOMU_ROOTFS_CONF: "${TOPDIR}/../%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/core-image-weston-%{DOMU_MACHINE}.rootfs.ext4"
         components:
           domu:
             builder:
@@ -641,6 +644,8 @@ parameters:
                 - "%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image"
               external_src:
                 domagl-ivi: "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/"
+              conf:
+                - [SODEV_FULL_DOMU_AGL_IVI_ROOTFS, "${TOPDIR}/../../../../../agl/build/tmp/deploy/images/%{AGL_GUEST_MACHINE}/%{AGL_GUEST_IMAGE_IVI}-%{AGL_GUEST_MACHINE}.rootfs.ext4"]
         images:
           full:
             partitions:
@@ -664,6 +669,8 @@ parameters:
                 - "%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/Image"
               external_src:
                 domagl-ic: "%{YOCTOS_WORK_DIR}/%{DOMU_BUILD_DIR}/tmp/deploy/images/%{DOMU_MACHINE}/"
+              conf:
+                - [SODEV_FULL_DOMU_AGL_IC_ROOTFS, "${TOPDIR}/../../../../../agl/build/tmp/deploy/images/%{AGL_GUEST_MACHINE}/%{AGL_GUEST_IMAGE_IC}-%{AGL_GUEST_MACHINE}.rootfs.ext4"]
         images:
           full:
             partitions:

@@ -2,5 +2,7 @@
 
 bootloader --ptable gpt
 
-part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=ext4 --label boot --fixed-size 256M --part-type 21686148-6449-6E6F-744E-656564454649
-part / --source rawcopy --sourceparams="file=${SODEV_FULL_DOMD_ROOTFS}" --ondisk mmcblk0 --part-type B921B045-1DF0-41C3-AF44-4C6F280D3FAE
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=ext4 --label boot --fixed-size 256M --align 1024 --part-name boot --part-type 21686148-6449-6E6F-744E-656564454649
+part / --source rawcopy --sourceparams="file=${SODEV_FULL_DOMD_ROOTFS}" --ondisk mmcblk0 --align 1024 --part-name domd_rootfs --part-type B921B045-1DF0-41C3-AF44-4C6F280D3FAE
+${SODEV_FULL_OPTIONAL_PARTS}
+part tailgap --ondisk mmcblk0 --fixed-size ${SODEV_FULL_FREE_SPACE} --no-table

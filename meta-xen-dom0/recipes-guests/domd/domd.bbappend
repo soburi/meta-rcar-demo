@@ -1,34 +1,22 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 RDEPENDS:${PN}:append = " dtc"
-DOMD_DEPLOY_DIR = "${TOPDIR}/tmp-domd/deploy/images/${DOMD_MACHINE}"
-DOMD_INITRAMFS_DEPLOY_NAME = "initramfs-domd.cpio.gz"
-
-do_install[mcdepends] += " \
-    mc::domd:virtual/kernel:do_deploy \
-    mc::domd:initramfs-image:do_image_complete \
-"
 
 SRC_URI:append = "\
     file://domd-set-root \
 "
 FILES:${PN}:append = " \
     ${libdir}/xen/bin/domd-set-root \
-    ${libdir}/xen/boot/${DOMD_INITRAMFS_DEPLOY_NAME} \
-    ${libdir}/xen/boot/*.dtbo \
 "
 
 CFG_FILE="${D}${sysconfdir}/xen/domd.cfg"
 
 do_install() {
     install -d ${D}${sysconfdir}/xen
-    install -d ${D}${libdir}/xen/boot
     install -d ${D}${systemd_unitdir}/system
     install -d ${D}${libdir}/xen/bin
 
     install -m 0644 ${WORKDIR}/${XT_DOMD_CONFIG_NAME} ${D}${sysconfdir}/xen/domd.cfg
-    install -m 0644 ${DOMD_DEPLOY_DIR}/${XT_DOMD_DTB_NAME} ${D}${libdir}/xen/boot/domd.dtb
-    install -m 0644 ${DOMD_DEPLOY_DIR}/Image ${D}${libdir}/xen/boot/linux-domd
     install -m 0644 ${WORKDIR}/domd.service ${D}${systemd_unitdir}/system/
     install -m 0744 ${WORKDIR}/domd-set-root ${D}${libdir}/xen/bin
 
@@ -48,13 +36,4 @@ do_install() {
     # Call domd-set-root script before launching domain
     echo "[Service]" >> ${D}${systemd_unitdir}/system/domd.service
     echo "ExecStartPre=${libdir}/xen/bin/domd-set-root" >> ${D}${systemd_unitdir}/system/domd.service
-
-    # Add initramfs
-    install -m 0644 ${DOMD_DEPLOY_DIR}/${DOMD_INITRAMFS_DEPLOY_NAME} ${D}${libdir}/xen/boot/${DOMD_INITRAMFS_DEPLOY_NAME}
-
-    # install dtbo for DomD
-    for f in ${DOMD_DEPLOY_DIR}/*.dtbo; do
-        [ -e "$f" ] || continue
-        install -m 0644 "$f" ${D}${libdir}/xen/boot/
-    done
 }
