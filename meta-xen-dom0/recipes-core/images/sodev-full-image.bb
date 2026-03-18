@@ -47,13 +47,13 @@ do_prepare_domd_disk_inputs[mcdepends] += " \
 
 python __anonymous() {
     parts = []
+    domu_rootfs = d.getVar("SODEV_FULL_DOMU_ROOTFS") or ""
 
-    for varname, mountpoint, part_name in (
-        ("SODEV_FULL_DOMU_ROOTFS", "/domu-rootfs", "domu-rootfs"),
-        ("SODEV_FULL_DOMU_AGL_IVI_ROOTFS", "/domu-agl-ivi-rootfs", "domu-agl-ivi-rootfs"),
-        ("SODEV_FULL_DOMU_AGL_IC_ROOTFS", "/domu-agl-ic-rootfs", "domu-agl-ic-rootfs"),
+    for image_path, mountpoint, part_name in (
+        (domu_rootfs, "/domu-rootfs", "domu-rootfs"),
+        (d.getVar("SODEV_FULL_DOMU_AGL_IVI_ROOTFS") or "", "/domu-agl-ivi-rootfs", "domu-agl-ivi-rootfs"),
+        (d.getVar("SODEV_FULL_DOMU_AGL_IC_ROOTFS") or "", "/domu-agl-ic-rootfs", "domu-agl-ic-rootfs"),
     ):
-        image_path = d.getVar(varname) or ""
         if image_path:
             parts.append(
                 "part %s --source rawcopy --sourceparams=\"file=%s\" "
