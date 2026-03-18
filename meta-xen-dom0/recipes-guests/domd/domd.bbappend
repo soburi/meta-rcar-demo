@@ -26,10 +26,6 @@ do_install() {
     install -d ${D}${systemd_unitdir}/system
     install -d ${D}${libdir}/xen/bin
 
-    [ -e "${DOMD_DEPLOY_DIR}/${XT_DOMD_DTB_NAME}" ] || bbfatal "Missing DomD DTB file: ${DOMD_DEPLOY_DIR}/${XT_DOMD_DTB_NAME}"
-    [ -e "${DOMD_DEPLOY_DIR}/Image" ] || bbfatal "Missing DomD kernel Image file: ${DOMD_DEPLOY_DIR}/Image"
-    [ -e "${DOMD_DEPLOY_DIR}/${DOMD_INITRAMFS_DEPLOY_NAME}" ] || bbfatal "Missing DomD initramfs file: ${DOMD_DEPLOY_DIR}/${DOMD_INITRAMFS_DEPLOY_NAME}"
-
     install -m 0644 ${WORKDIR}/${XT_DOMD_CONFIG_NAME} ${D}${sysconfdir}/xen/domd.cfg
     install -m 0644 ${DOMD_DEPLOY_DIR}/${XT_DOMD_DTB_NAME} ${D}${libdir}/xen/boot/domd.dtb
     install -m 0644 ${DOMD_DEPLOY_DIR}/Image ${D}${libdir}/xen/boot/linux-domd
