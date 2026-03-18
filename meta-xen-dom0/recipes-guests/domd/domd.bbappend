@@ -3,9 +3,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 RDEPENDS:${PN}:append = " dtc"
 DOMD_DEPLOY_DIR = "${TOPDIR}/tmp-domd/deploy/images/${DOMD_MACHINE}"
 DOMD_INITRAMFS_DEPLOY_NAME = "initramfs-domd.cpio.gz"
-DOMD_DTB_DEPLOY_PATH = "${DOMD_DEPLOY_DIR}/${XT_DOMD_DTB_NAME}"
-DOMD_KERNEL_DEPLOY_PATH = "${DOMD_DEPLOY_DIR}/Image"
-DOMD_INITRAMFS_DEPLOY_PATH = "${DOMD_DEPLOY_DIR}/${DOMD_INITRAMFS_DEPLOY_NAME}"
 
 do_install[mcdepends] += " \
     mc:dom0:domd:virtual/kernel:do_deploy \
@@ -29,13 +26,13 @@ do_install() {
     install -d ${D}${systemd_unitdir}/system
     install -d ${D}${libdir}/xen/bin
 
-    [ -e "${DOMD_DTB_DEPLOY_PATH}" ] || bbfatal "Missing DomD DTB file: ${DOMD_DTB_DEPLOY_PATH}"
-    [ -e "${DOMD_KERNEL_DEPLOY_PATH}" ] || bbfatal "Missing DomD kernel Image file: ${DOMD_KERNEL_DEPLOY_PATH}"
-    [ -e "${DOMD_INITRAMFS_DEPLOY_PATH}" ] || bbfatal "Missing DomD initramfs file: ${DOMD_INITRAMFS_DEPLOY_PATH}"
+    [ -e "${DOMD_DEPLOY_DIR}/${XT_DOMD_DTB_NAME}" ] || bbfatal "Missing DomD DTB file: ${DOMD_DEPLOY_DIR}/${XT_DOMD_DTB_NAME}"
+    [ -e "${DOMD_DEPLOY_DIR}/Image" ] || bbfatal "Missing DomD kernel Image file: ${DOMD_DEPLOY_DIR}/Image"
+    [ -e "${DOMD_DEPLOY_DIR}/${DOMD_INITRAMFS_DEPLOY_NAME}" ] || bbfatal "Missing DomD initramfs file: ${DOMD_DEPLOY_DIR}/${DOMD_INITRAMFS_DEPLOY_NAME}"
 
     install -m 0644 ${WORKDIR}/${XT_DOMD_CONFIG_NAME} ${D}${sysconfdir}/xen/domd.cfg
-    install -m 0644 "${DOMD_DTB_DEPLOY_PATH}" ${D}${libdir}/xen/boot/domd.dtb
-    install -m 0644 "${DOMD_KERNEL_DEPLOY_PATH}" ${D}${libdir}/xen/boot/linux-domd
+    install -m 0644 ${DOMD_DEPLOY_DIR}/${XT_DOMD_DTB_NAME} ${D}${libdir}/xen/boot/domd.dtb
+    install -m 0644 ${DOMD_DEPLOY_DIR}/Image ${D}${libdir}/xen/boot/linux-domd
     install -m 0644 ${WORKDIR}/domd.service ${D}${systemd_unitdir}/system/
     install -m 0744 ${WORKDIR}/domd-set-root ${D}${libdir}/xen/bin
 
@@ -57,7 +54,7 @@ do_install() {
     echo "ExecStartPre=${libdir}/xen/bin/domd-set-root" >> ${D}${systemd_unitdir}/system/domd.service
 
     # Add initramfs
-    install -m 0644 "${DOMD_INITRAMFS_DEPLOY_PATH}" ${D}${libdir}/xen/boot/${DOMD_INITRAMFS_DEPLOY_NAME}
+    install -m 0644 ${DOMD_DEPLOY_DIR}/${DOMD_INITRAMFS_DEPLOY_NAME} ${D}${libdir}/xen/boot/${DOMD_INITRAMFS_DEPLOY_NAME}
 
     # install dtbo for DomD
     for f in ${DOMD_DEPLOY_DIR}/*.dtbo; do
