@@ -358,6 +358,7 @@ parameters:
                   "flash.bin": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-domd/deploy/images/%{DOMD_MACHINE}/ipl-burning/flash.bin"
                   "fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{DOM0_MACHINE}/fitImage"
                   "/boot/fitImage": "%{YOCTOS_WORK_DIR}/%{DOM0_BUILD_DIR}/tmp-dom0/deploy/images/%{DOM0_MACHINE}/fitImage"
+
   USE_GRAPHICS_PACKAGE:
     desc: "Enable GPU on DomD"
     "no":
