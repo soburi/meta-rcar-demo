@@ -1,0 +1,13 @@
+[Unit]
+Description=DomZ
+Requires=backend-ready@bridge.service
+After=backend-ready@bridge.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/xl create /etc/xen/domz.cfg
+ExecStop=/usr/sbin/xl destroy DomZ
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
