@@ -1,0 +1,74 @@
+From 54e3732a5885a54d277c5f96eee106a220fbe945 Mon Sep 17 00:00:00 2001
+From: Yuya Hamamachi <yuya.hamamachi.sx@renesas.com>
+Date: Thu, 26 Mar 2026 13:42:19 +0900
+Subject: [PATCH] XSM: Add domZ policy
+
+Signed-off-by: Yuya Hamamachi <yuya.hamamachi.sx@renesas.com>
+---
+ tools/flask/policy/modules/domZ.te      | 41 +++++++++++++++++++++++++
+ tools/flask/policy/modules/modules.conf |  1 +
+ 2 files changed, 42 insertions(+)
+ create mode 100644 tools/flask/policy/modules/domZ.te
+
+diff --git a/tools/flask/policy/modules/domZ.te b/tools/flask/policy/modules/domZ.te
+new file mode 100644
+index 0000000000..0e3cd35d73
+--- /dev/null
++++ b/tools/flask/policy/modules/domZ.te
+@@ -0,0 +1,41 @@
++###############################################################################
++#
++# Domain creation
++#
++###############################################################################
++
++declare_domain(domZ_t)
++domain_self_comms(domZ_t)
++create_domain(dom0_t, domZ_t)
++manage_domain(dom0_t, domZ_t)
++domain_comms(dom0_t, domZ_t)
++domain_comms(domZ_t, domZ_t)
++migrate_domain_out(dom0_t, domZ_t)
++domain_self_comms(domZ_t)
++
++# Allow the hypervisor to build domains of type domZ_t
++xen_build_domain(domZ_t)
++
++# Device model for domZ_t.  You can define distinct types for device models for
++# domains of other types, or add more make_device_model lines for this type.
++create_domain(dom0_t, dm_dom_t)
++manage_domain(dom0_t, dm_dom_t)
++domain_comms(dom0_t, dm_dom_t)
++make_device_model(dom0_t, dm_dom_t, domZ_t)
++
++# This is required for PCI (or other device) passthrough
++delegate_devices(dom0_t, domZ_t)
++
++# Both of these domain types can be created using the default (system) role
++role system_r types { domZ_t dm_dom_t };
++
++use_device_iommu_nointremap(domZ_t, irq_t)
++use_device_iommu_nointremap(domZ_t, iomem_t)
++use_device_iommu_nointremap(domZ_t, device_t)
++use_device_iommu_nointremap(domZ_t, ioport_t)
++
++allow domU_t iomem_t:resource use_noiommu;
++allow domU_t ioport_t:resource use_noiommu;
++allow domU_t irq_t:resource use_noiommu;
++allow domU_t device_t:resource use_noiommu;
++
+diff --git a/tools/flask/policy/modules/modules.conf b/tools/flask/policy/modules/modules.conf
+index 391d6f830a..bd62385369 100644
+--- a/tools/flask/policy/modules/modules.conf
++++ b/tools/flask/policy/modules/modules.conf
+@@ -25,6 +25,7 @@ guest_features = on
+ # their XSM label in the configuration.
+ domU = on
+ domD = on
++domZ = on
+ 
+ # Example types with restrictions
+ isolated_domU = on
+-- 
+2.34.1
+

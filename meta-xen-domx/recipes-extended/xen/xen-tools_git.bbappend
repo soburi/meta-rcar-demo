@@ -36,6 +36,8 @@ FILES:${PN} += "/var/lib /usr/lib/xen/bin/* /boot/*"
 
 SYSTEMD_SERVICE:xen-tools:remove = "systemd-remount-fs.service"
 
+SRC_URI:append = " file://0001-XSM-Add-domZ-policy.patch"
+
 ###
 # TEMPORARY HACK
 SRC_URI:append = " file://hack-xdg_runtime_dir.conf"

@@ -6,6 +6,7 @@ variables:
   DOM0_BUILD_DIR: "build-dom0"
   DOMD_BUILD_DIR: "build-domd"
   DOMU_BUILD_DIR: "build-domu"
+  DOMZ_BUILD_DIR: "build-domz"
   XT_DOMD_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-domd.dtb"
   XT_DOMU_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-domu.dtb"
   XT_XEN_DTB_NAME: "%{SOC_FAMILY}-%{MACHINE}-xen.dtb"
@@ -271,6 +272,27 @@ components:
         - "out/target/product/%{ANDROID_DEVICE}/super.img"
       additional_deps:
         - "../%{ANDROID_KERNEL_DIR}/%{ANDROID_KERNEL_DEPLOY_DIR}/Image"
+
+  domz:
+    build-dir: "%{DOMZ_BUILD_DIR}"
+    sources:
+      - type: git
+        url: "https://github.com/yhamamachi/zephyr.git"
+        rev: "sh-can"
+    builder:
+      type: custom_script
+      script: "./zephyr/_build_xenvm.sh"
+      args:
+        - "can_echoback"
+        #- "hello_world"
+      #type: zephyr
+      #board: "sparrowhawk_rcar_v4h/r8a779g0/a76"
+      #target: zephyr/can_echoback
+      #work_dir: "zephyr"
+      #snippets: 
+      #  - sparrowhawk_rcar_v4h_xen_domd
+      target_images:
+        - "%{DOMZ_BUILD_DIR}/zephyr/build/zephyr/zephyr.bin"
 
   boot_artifacts:
     build-dir: "artifacts"
@@ -724,22 +746,18 @@ parameters:
 
 
   ENABLE_ZEPHYR:
-    desc: "Build zephyr images and put into fitImage"
+    desc: "Build zephyr images"
     "no":
       default: true
     "yes":
       overrides:
         components:
           dom0:
-            sources:
-              - type: git
-                url: https://github.com/soburi/meta-zephyr.git
-                rev: sodev
             builder:
-              layers:
-                - "../meta-zephyr/meta-zephyr-core"
-                - "../../../meta-xen-domz"
               conf:
-                - [ZEPHYR_TOOLCHAIN_VARIANT, "zephyr"]
                 - [XT_GUEST_INSTALL:append, " domz"]
-                - [DOMD_MACHINE, "%{MACHINE}"]
+              additional_deps:
+                - "../%{DOMZ_BUILD_DIR}/zephyr/build/zephyr/zephyr.bin"
+              external_src:
+                domz: "%{YOCTOS_WORK_DIR}/../%{DOMZ_BUILD_DIR}/zephyr"
+

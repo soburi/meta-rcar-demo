@@ -5,28 +5,29 @@ PV = "0.1"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
+inherit externalsrc
+EXTERNALSRC_SYMLINKS = ""
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI = "\
-    file://zephyr_blinky.conf \
+    file://domz.cfg \
 "
 
 S = "${WORKDIR}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILES:${PN} = " \
-    ${sysconfdir}/xen/zephyr_blinky.conf \
-    ${libdir}/xen/boot/zephyr_blinky.bin \
-"
-
-do_install[depends] += " \
-    zephyr-blinky:do_deploy \
+    ${sysconfdir}/xen/domz.cfg \
+    ${libdir}/xen/boot/zephyr.bin \
+    ${libdir}/xen/boot/zephyr.dtb \
 "
 
 do_install() {
     install -d ${D}${sysconfdir}/xen
     install -d ${D}${libdir}/xen/boot
 
-    install -m 0644 ${WORKDIR}/zephyr_blinky.conf ${D}${sysconfdir}/xen/zephyr_blinky.conf
-    install -m 0644 ${DEPLOY_DIR_IMAGE}/zephyr_blinky.bin ${D}${libdir}/xen/boot/zephyr_blinky.bin
+    install -m 0644 ${WORKDIR}/domz.cfg ${D}${sysconfdir}/xen/domz.cfg
+    install -m 0644 ${S}/build/zephyr/zephyr.bin ${D}${libdir}/xen/boot/zephyr.bin
+    install -m 0644 ${S}/build/zephyr/zephyr.dtb ${D}${libdir}/xen/boot/zephyr.dtb
 }
