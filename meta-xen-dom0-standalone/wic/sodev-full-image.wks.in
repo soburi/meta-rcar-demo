@@ -1,0 +1,7 @@
+# short-description: Full Xen disk image without rouge
+
+bootloader --ptable gpt
+
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=ext4 --label boot --fixed-size 256M --align 1024 --part-name boot --part-type 21686148-6449-6E6F-744E-656564454649
+${SODEV_FULL_OPTIONAL_PARTS}
+part tailgap --ondisk mmcblk0 --fixed-size ${SODEV_FULL_FREE_SPACE} --no-table

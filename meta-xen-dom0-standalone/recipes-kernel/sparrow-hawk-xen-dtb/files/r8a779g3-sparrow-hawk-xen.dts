@@ -1,0 +1,20 @@
+#include "r8a779g3-sparrow-hawk.dts"
+#include "r8a779g3-xen-chosen.dtsi"
+#include "r8a779g3-xen.dts"
+
+/ {
+	model = "Retronix Sparrow Hawk board based on r8a779g3, running XEN hypervisor";
+
+	/* Workaround U-Boot issue with memory nodes duplication */
+	/delete-node/ memory@48000000;
+	/delete-node/ memory@480000000;
+	/delete-node/ memory@600000000;
+	memory@48000000 {
+		device_type = "memory";
+		/* first 128MB is reserved for secure area. */
+		reg = <0x0 0x48000000 0x0 0x78000000
+		       0x4 0x80000000 0x0 0x80000000
+		       0x6 0x00000000 0x1 0x00000000>;
+	};
+};
+
