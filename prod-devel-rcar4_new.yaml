@@ -277,7 +277,7 @@ components:
     build-dir: "%{DOMZ_BUILD_DIR}"
     sources:
       - type: git
-        url: "https://github.com/yhamamachi/zephyr.git"
+        url: "https://github.com/soburi/zephyr.git"
         rev: "sh-can"
     builder:
       type: custom_script
