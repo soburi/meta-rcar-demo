@@ -2,3 +2,9 @@
 
 #include "r8a779g3-domd.dts"
 
+/* Leave GPIO2_13 as a GPIO. */
+&pwm1 {
+	/delete-property/ pinctrl-0;
+	/delete-property/ pinctrl-names;
+	status = "disabled";
+};
