@@ -1,0 +1,68 @@
+#!/bin/sh
+
+set -eu
+
+GPSR2_ADDR=0xE6058040
+GPIO2_PIN_COUNT=20
+DEBUGFS=/sys/kernel/debug
+PINCTRL_DEBUGFS=${DEBUGFS}/pinctrl
+
+COMMAND_NAME=$(basename "$0")
+
+die() {
+    echo "${COMMAND_NAME}: $*" >&2
+    exit 1
+}
+
+[ "$(id -u)" -eq 0 ] || die "run as root"
+
+grep -qw debugfs /proc/filesystems || die "kernel has no debugfs support"
+
+if ! grep -qs ' /sys/kernel/debug debugfs ' /proc/mounts; then
+    mount -t debugfs debugfs "${DEBUGFS}"
+fi
+
+echo "GPIO2 live pinctrl information (GPIO2_0 through GPIO2_19):"
+
+echo ""
+echo "GPSR2 register (one bit per GPIO2 pin):"
+devmem_output=$(devmem2 "${GPSR2_ADDR}" 2>/dev/null) || \
+    die "cannot read ${GPSR2_ADDR} through /dev/mem"
+printf '%s\n' "${devmem_output}"
+
+gpsr_value=$(printf '%s\n' "${devmem_output}" |
+    sed -n 's/.*\(0x[[:xdigit:]][[:xdigit:]]*\)[[:space:]]*$/\1/p' |
+    tail -n 1)
+[ -n "${gpsr_value}" ] || die "could not parse devmem2 output"
+
+gpsr_numeric=$((gpsr_value))
+
+bit=0
+while [ "${bit}" -lt "${GPIO2_PIN_COUNT}" ]; do
+    pin_name=$(printf 'GPIO2_%02d' "${bit}")
+    mask=$((1 << bit))
+    if [ $((gpsr_numeric & mask)) -ne 0 ]; then
+        mux_state="peripheral mux"
+        mux_bit=1
+    else
+        mux_state="GPIO mux"
+        mux_bit=0
+    fi
+
+    echo "${pin_name}: GPSR2[${bit}]=${mux_bit} (${mux_state})"
+    found=0
+    for pinmux in "${PINCTRL_DEBUGFS}"/*/pinmux-pins; do
+        [ -r "${pinmux}" ] || continue
+        matches=$(grep -E "\\(GP_2_${bit}\\):" "${pinmux}" || true)
+        if [ -n "${matches}" ]; then
+            echo "  -- ${pinmux}"
+            printf '  %s\n' "${matches}"
+            found=1
+        fi
+    done
+    if [ "${found}" -eq 0 ]; then
+        echo "  -- no pinctrl debugfs entry"
+    fi
+
+    bit=$((bit + 1))
+done

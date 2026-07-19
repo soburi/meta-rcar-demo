@@ -23,6 +23,11 @@ IMAGE_INSTALL:append = " \
 "
 
 IMAGE_INSTALL:append = " \
+    devmem2 \
+    pinctrl-gpsr-check \
+"
+
+IMAGE_INSTALL:append = " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'enable_virtio', ' qemu-system-aarch64 qemu-keymaps', '', d)} \
     block \
     ${@bb.utils.contains('DISTRO_FEATURES', 'enable_virtio wayland', ' virglrenderer libsdl2', '', d)} \
@@ -40,4 +45,3 @@ install_udev_rules() {
     mkdir -p ${IMAGE_ROOTFS}/etc/udev/rules.d
     install -m 0755 ${BBAPPEND_DIR}/files/99-bind-input-devices.rules ${IMAGE_ROOTFS}/etc/udev/rules.d/
 }
-
