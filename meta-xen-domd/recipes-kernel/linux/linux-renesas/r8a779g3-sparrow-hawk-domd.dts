@@ -2,9 +2,11 @@
 
 #include "r8a779g3-domd.dts"
 
-/* Leave GPIO2_13 as a GPIO. */
+/* Keep GPIO2_13 as a GPIO and route PWM1 to the unconnected PWM1_A pin. */
+&pwm1_pins {
+	groups = "pwm1_a";
+};
+
 &pwm1 {
-	/delete-property/ pinctrl-0;
-	/delete-property/ pinctrl-names;
-	status = "disabled";
+	status = "okay";
 };
