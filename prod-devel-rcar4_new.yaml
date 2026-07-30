@@ -41,13 +41,13 @@ common_data:
   # Sources used by all yocto-based domains
   sources: &COMMON_SOURCES
     - type: git
-      url: "git://git.yoctoproject.org/poky"
+      url: "https://git.yoctoproject.org/poky"
       rev: scarthgap
     - type: git
-      url: "git://git.openembedded.org/meta-openembedded"
+      url: "https://git.openembedded.org/meta-openembedded"
       rev: scarthgap
     - type: git
-      url: "git://git.yoctoproject.org/meta-virtualization"
+      url: "https://git.yoctoproject.org/meta-virtualization"
       rev: scarthgap
     - type: git
       url: "https://github.com/xen-troops/meta-xt-common.git"
@@ -164,7 +164,7 @@ components:
     sources:
       - *COMMON_SOURCES
       - type: git
-        url: git://git.yoctoproject.org/meta-selinux
+        url: https://git.yoctoproject.org/meta-selinux
         rev: scarthgap
     builder:
       type: yocto
@@ -590,7 +590,7 @@ parameters:
           domu:
             sources:
               - type: git
-                url: git://code.qt.io/yocto/meta-qt6.git
+                url: https://code.qt.io/yocto/meta-qt6.git
                 rev: 9bd2c2ae4b4fb536975904fe494813408a2282a3
                 # dev branch
             builder:
