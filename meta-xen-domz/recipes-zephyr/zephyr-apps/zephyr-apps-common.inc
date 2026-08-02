@@ -14,6 +14,7 @@ SRC_URI = "\
     git://github.com/zephyrproject-rtos/trusted-firmware-a.git;protocol=https;name=tfa;nobranch=1;destsuffix=git/modules/tee/tf-a/trusted-firmware-a \
     git://github.com/zephyrproject-rtos/trusted-firmware-m.git;protocol=https;name=tfm;nobranch=1;destsuffix=git/modules/tee/tf-m/trusted-firmware-m \
     git://github.com/zephyrproject-rtos/uoscore-uedhoc.git;protocol=https;name=uedhoc;nobranch=1;destsuffix=git/modules/lib/uoscore-uedhoc \
+    git://github.com/soburi/zephyr-xenlib.git;protocol=https;name=xenlib;branch=xs-client;destsuffix=git/modules/lib/zephyr-xenlib \
 "
 
 SRCREV_cmsis = "512cc7e895e8491696b61f7ba8066b4a182569b8"
@@ -27,6 +28,7 @@ SRCREV_picolibc = "ca8b6ebba5226a75545e57a140443168a26ba664"
 SRCREV_tfa = "0a29cac8fe0f7bdb835b469d9ea11b8e17377a92"
 SRCREV_tfm = "04aa7243e04946b5422b124bea9c0675ab6b120f"
 SRCREV_uedhoc = "54abc109c9c0adfd53c70077744c14e454f04f4a"
+SRCREV_xenlib = "353b6f5c0be653b5bbca80241e935caa932788f4"
 SRCREV_FORMAT = "default"
 
 DEPENDS:append = " python3-jsonschema-native dtc-native"
