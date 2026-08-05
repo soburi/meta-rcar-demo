@@ -13,6 +13,7 @@ SRC_URI = "\
     file://zephyr_blinky.conf \
     file://zephyr_can_echoback.conf \
     file://zephyr_vhost_blk.conf \
+    file://zephyr_virtio_blk.conf \
     file://domz.service \
 "
 
@@ -26,6 +27,8 @@ FILES:${PN} = " \
     ${libdir}/xen/boot/zephyr_can_echoback.bin \
     ${sysconfdir}/xen/zephyr_vhost_blk.conf \
     ${libdir}/xen/boot/zephyr_vhost_blk.bin \
+    ${sysconfdir}/xen/zephyr_virtio_blk.conf \
+    ${libdir}/xen/boot/zephyr_virtio_blk.bin \
     ${systemd_unitdir}/system/domz.service \
 "
 
@@ -36,6 +39,7 @@ do_install[depends] += " \
     zephyr-blinky:do_deploy \
     zephyr-can-echoback:do_deploy \
     zephyr-vhost-blk:do_deploy \
+    zephyr-virtio-blk:do_deploy \
 "
 
 do_install() {
@@ -50,6 +54,9 @@ do_install() {
 
     install -m 0644 ${WORKDIR}/zephyr_vhost_blk.conf ${D}${sysconfdir}/xen/zephyr_vhost_blk.conf
     install -m 0644 ${DEPLOY_DIR_IMAGE}/zephyr_vhost_blk.bin ${D}${libdir}/xen/boot/zephyr_vhost_blk.bin
+
+    install -m 0644 ${WORKDIR}/zephyr_virtio_blk.conf ${D}${sysconfdir}/xen/zephyr_virtio_blk.conf
+    install -m 0644 ${DEPLOY_DIR_IMAGE}/zephyr_virtio_blk.bin ${D}${libdir}/xen/boot/zephyr_virtio_blk.bin
 
     install -d ${D}${systemd_unitdir}/system
     install -m 0644 ${WORKDIR}/domz.service ${D}${systemd_unitdir}/system/
