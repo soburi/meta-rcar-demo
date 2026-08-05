@@ -1,12 +1,17 @@
 [Unit]
-Description=DomZ
+Description=Zephyr VirtIO block frontend and vhost backend
 Requires=backend-ready@bridge.service
 After=backend-ready@bridge.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/sbin/xl create /etc/xen/zephyr_can_echoback.conf
-ExecStop=/usr/sbin/xl destroy zephyr_can_echoback
+ExecStart=/usr/sbin/xl create -p /etc/xen/zephyr_vhost_blk.conf
+ExecStart=/usr/sbin/xl create -p /etc/xen/zephyr_virtio_blk.conf
+ExecStart=/usr/sbin/xl unpause zephyr_vhost_blk
+ExecStart=/bin/sleep 1
+ExecStart=/usr/sbin/xl unpause zephyr_virtio_blk
+ExecStopPost=-/usr/sbin/xl destroy zephyr_virtio_blk
+ExecStopPost=-/usr/sbin/xl destroy zephyr_vhost_blk
 RemainAfterExit=true
 
 [Install]
